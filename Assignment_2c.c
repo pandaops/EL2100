@@ -25,15 +25,16 @@ for(i=0;i<9;i++)
       max=p[i];
   }
 }
+printf("\n");
 // Plotting Logic
 for(i=max;i>0;i--)
 {
-   printf("%d|",i);
+   printf("|",i);
    for(j=1;j<11;j++)
    {
       if(p[j]>=i)
       {
-          printf("# ");
+          printf("* ");
       }
       else
       {
@@ -42,7 +43,8 @@ for(i=max;i>0;i--)
    }
    printf("\n");
 }
-printf(" |1-2-3-4-5-6-7-8-9-10");
+printf("|_____________________\n");
+printf("|1 2 3 4 5 6 7 8 9 10\n");
 }
 
 int main(int argc, char **argv)
@@ -95,7 +97,6 @@ while(fgets(buf, MAXLENGTH, fp))
         if(buf[counter]=='\0')
         {
             wordlen=counter-tempcount-1;
-            printf("word is %d long\n",wordlen);
             wordcount[wordlen]+=1;    
             wordlen=0;
             tempcount=0;
@@ -109,5 +110,6 @@ for(counter=1;counter<11;counter++)
     printf("The no. of %d lettered words are %d \n", counter, wordcount[counter]);    
 }
 histogram(wordcount);           
+fclose(fp);
 return 0;
 }
