@@ -13,6 +13,8 @@
    EE11B122
 */
 
+
+// This evaluates f(x) for each x
 float Eval(float x)
 {
     float fx=0;
@@ -40,6 +42,7 @@ int main(int argc, char **argv)
     double x[SAMPLE_SIZE];   // The sample values
     double fx[SAMPLE_SIZE];  // Corresponding f(x) values
     float step = (float)((SAMPLE_UPPER-SAMPLE_LOWER)/k);
+    // step is calculated before loop 
     for(i=0; i<k; i++)
     {
         x[i] = SAMPLE_LOWER + step*(i);
@@ -51,12 +54,12 @@ int main(int argc, char **argv)
     }
     slope = (xy - (xsum * ysum)/k) / (xsqr - (xsum * xsum)/k); // Best fit for m
     intercept = (ysum - (slope*xsum))/k;                       // Best fit for c
-    fprintf(p,"# m= %f  c= %f \n",slope, intercept);
+    fprintf(p,"# m= %f  c= %f \n",slope, intercept);           // Write to File 
     fprintf(p,"# x f(x) mx+c \n");
     for(i=0; i<k; i++)
     {
-        fprintf(p,"%f %f %f \n", x[i], fx[i], (slope*x[i]+intercept));
+        fprintf(p,"%f %f %f \n", x[i], fx[i], (slope*x[i]+intercept)); // Write to file
     }
     fclose(p);
-    system("gnuplot -e 'plot \"output1.dat\" u 1:2 w p,\"\" u 1:3 w l' -p");
+    system("gnuplot -e 'plot \"output1.dat\" u 1:2 w p,\"\" u 1:3 w l' -p"); // Execute system command to plot
 }
