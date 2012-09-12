@@ -1,0 +1,1208 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.25cm
+\topmargin 1.25cm
+\rightmargin 1.25cm
+\bottommargin 1.5cm
+\headheight 1.25cm
+\headsep 1.25cm
+\footskip 1.25cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Lyx - Practice Assignment
+\end_layout
+
+\begin_layout Author
+Swapnil Basak
+\begin_inset Newline newline
+\end_inset
+
+EE11B122
+\begin_inset Newline newline
+\end_inset
+
+IIT Madras
+\end_layout
+
+\begin_layout Section
+Abstract
+\end_layout
+
+\begin_layout Standard
+This report presents a study of various split-step fourier methods applied
+ to the problem of wave propagation down a dispersive, optical fibre.
+ It is found that the algorithms that centre the dispersion and the nonlinearity
+ computations about each other converge much better, i.e., the cumulative
+ error scales as 
+\begin_inset Formula $\Delta z^{4}$
+\end_inset
+
+.
+ Of such algorithms, the algorithm that takes a first half step (and last
+ half step) of dispersion is found to be superior to the algorithm that
+ starts and ends with nonlinearity half steps.
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+This report presents four different algorithms to solve the following equation
+ 
+\begin_inset Formula 
+\[
+\frac{\partial A}{\partial z}+i\frac{\partial^{2}A}{\partial t^{2}}=|A|^{2}A\qquad\qquad(1)
+\]
+
+\end_inset
+
+which appears in the theory of optical waveguides.
+ In this equation, z represents position in the “wave frame”, and both z
+ and t have been scaled to eliminate the constants usually present.
+ Here, A is the complex amplitude of the transverse Electric field of the
+ wave.
+\end_layout
+
+\begin_layout Standard
+Equation (1) is a nonlinear partial differential equation (PDE) of the hyperboli
+c, and is therefore difficult to solve.
+ In the absence of the nonlinear term (the term on the right), Eq.
+ (1) is a wave equation that can be solved by fourier methods.
+ In the absence of the time derivitive term, Eq.
+ (1) reduces to an ordinary differential equation, though a nonlinear one.
+ Such are easy to solve using a standard differential equation solver such
+ as the fifth order, adaptive step, Runge Kutta solver.
+\end_layout
+
+\begin_layout Standard
+To make progress, we consider solving the equation over a very small step
+ in 
+\begin_inset Formula $z$
+\end_inset
+
+.
+ It is easy to show that the two terms are additive in their effect in this
+ limit.
+ That is to say, first solve the linear equation (which represents “dispersion”)
+ from 
+\begin_inset Formula $z$
+\end_inset
+
+ to 
+\begin_inset Formula $z+dz$
+\end_inset
+
+.
+ Use that as initial condition and solve the nonlinear ODE from 
+\begin_inset Formula $z$
+\end_inset
+
+ to 
+\begin_inset Formula $z+dz$
+\end_inset
+
+.
+ In the limit of 
+\begin_inset Formula $dz$
+\end_inset
+
+ going to zero, this is equivalent to solving the full equation exactly.
+\end_layout
+
+\begin_layout Standard
+In this study, we try four different ways of carrying out this approach:
+\end_layout
+
+\begin_layout Enumerate
+Perform the following steps, using the result of each as the initial condition
+ of the next.
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Solve the linear equation from 
+\begin_inset Formula $z$
+\end_inset
+
+ to 
+\begin_inset Formula $z+dz$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Solve the nonlinear ODE from 
+\begin_inset Formula $z$
+\end_inset
+
+ to 
+\begin_inset Formula $z+dz$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Solve the linear equation from 
+\begin_inset Formula $z+dz$
+\end_inset
+
+ to 
+\begin_inset Formula $z+2dz$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+etc.
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Perform the following steps:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Solve the nonlinear ODE from 
+\begin_inset Formula $z$
+\end_inset
+
+ to 
+\begin_inset Formula $z+dz$
+\end_inset
+
+.
+ Save the result.
+\end_layout
+
+\begin_layout Enumerate
+Solve the linear equation from 
+\begin_inset Formula $z$
+\end_inset
+
+ to 
+\begin_inset Formula $z+dz$
+\end_inset
+
+.
+ Save the result.
+\end_layout
+
+\begin_layout Enumerate
+Average the results of (a) and (b) to obtain the initial condition for the
+ next step.
+\end_layout
+
+\begin_layout Enumerate
+etc.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+\begin_inset Float table
+wide true
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Cumulative error due to different split-step algorithms for an optical link
+ of 100 Km.
+ Algorithm 1 calculates the contribution from nonlinearity (NL) first, and
+ then uses the result to compute the contribution from dispersion (D).
+ Algorithm 2 calculates NL and D based on the original signal.
+ Algorithm 3 computes NL for a half step, and then computes D and NL, each
+ centered about the other, with a final half step of NL.
+ Algorithm 4 computes D for a half step, and then computes NL and D, each
+ centered about the other, with a final step of D.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="11" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $dz$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\varepsilon_{1}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula $\varepsilon\mbox{\ensuremath{_{2}}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula $\varepsilon_{3}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula $\varepsilon_{4}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+10
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.824\times10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.393\times10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.589\times10^{-12}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $9.099\times10^{-14}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+20
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $7.17\times10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $9.396\times10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $4.150\times10^{-11}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.467\times10^{-12}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+30
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula $1.341\times10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.812\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.052\times10^{-10}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $7.260\times10^{-12}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+40
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.137\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.959\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $6.111\times10^{-10}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.143\times10^{-11}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+50
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $4.206\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $5.651\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.643\times10^{-9}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $6.069\times10^{-11}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+60
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $4.229\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $6.063\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.662\times10^{-9}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $8.902\times10^{-11}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+70
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $4.930\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $7.524\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $5.306\times10^{-9}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.768\times10^{-10}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+80
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $6.545\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.000\times10^{-6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.033\times10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $3.636\times10^{-10}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+90
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $9.507\times10^{-7}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.500\times10^{-6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.813\times10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $7.003\times10^{-10}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+100
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.500\times10^{-6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.200\times10^{-6}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $2.830\times10^{-8}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $1.235\times10^{-9}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Perform the following steps, using the result of each as the initial condition
+ of the next.
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Take a step of 
+\begin_inset Formula $dz/2$
+\end_inset
+
+ first, on which the linear equation is solved.
+\end_layout
+
+\begin_layout Enumerate
+Now solve the nonlinear ODE from 
+\begin_inset Formula $z$
+\end_inset
+
+ to 
+\begin_inset Formula $z+dz$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Solve the linear equation from 
+\begin_inset Formula $z+dz/2$
+\end_inset
+
+ to 
+\begin_inset Formula $z+3dz/2$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+Solve the ODE from 
+\begin_inset Formula $z+dz$
+\end_inset
+
+ to 
+\begin_inset Formula $z+2dz$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+etc.
+\end_layout
+
+\begin_layout Enumerate
+Solve the linear equation from 
+\begin_inset Formula $L-dz/2$
+\end_inset
+
+ to 
+\begin_inset Formula $L$
+\end_inset
+
+.
+\end_layout
+
+\end_deeper
+\begin_layout Section*
+Results and Discussion
+\end_layout
+
+\begin_layout Standard
+The four algorithms described in the Introduction were implemented in C.
+ The simulation was carried out for a fixed length of waveguide, using different
+ dz.
+ As this particular choice of coefficients is theoretically tractable, the
+ exact solution was also known.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide true
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Scaling of Error for different split-step algorithms.
+ The points correspond to the data in Table 1.
+ The lines correspond to best power-law fits as indicated in the legends.
+ As can be seen, algorithms 1 and 2 scale as 
+\begin_inset Formula $dz^{2}$
+\end_inset
+
+ , while algorithms 3 and 4 scale as 
+\begin_inset Formula $dz^{4}$
+\end_inset
+
+ .
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename /home/swapnil/Downloads/fig1.ps
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Table 1 presents the error in each algorithm, for different 
+\begin_inset Formula $dz$
+\end_inset
+
+ values.
+ Figure 1 presents the same data in a log-log plot.
+ Each series was also fitted to a power law fit of the form 
+\begin_inset Formula 
+\[
+adz^{b}
+\]
+
+\end_inset
+
+ and the corresponding best fit a and b were obtained.
+ These are indicated in the legend in the figure.
+\end_layout
+
+\begin_layout Standard
+All the algorithms performed better as 
+\begin_inset Formula $dz$
+\end_inset
+
+ is reduced.
+ This was expected, since the algorithms are all exact in the limit of dz
+ going to zero.
+ It is clear from the results, however, that the first two algorithms are
+ inferior in that the error improves slowly as dz is decreased.
+ The third and fourth algorithms improved as 
+\begin_inset Formula $dz^{4}$
+\end_inset
+
+, while the first two improved only as 
+\begin_inset Formula $dz^{2}$
+\end_inset
+
+.
+ This is a clear indication that the interleaving of nonlinearity and dispersion
+ manages error in a much better fashion.
+\end_layout
+
+\begin_layout Standard
+While both algorithms (3) and (4) scaled the same, there was a clear two
+ orders of improvement in error when using algorithm (4).
+ The difference between the two algorithms is merely that the third algorithm
+ uses a first and last half-step of nonlinearity, while the fourth algorithm
+ uses a first and last half-step of dispersion.
+ It is clear that the nonlinear term is a delicate term that is susceptible
+ to error if it is carried out in a “ non-centered” manner.
+ Thus it always has to be sandwitched between dispersion computations.
+\end_layout
+
+\begin_layout Standard
+To conclude, it is clear that not all split-step fourier methods are equal.
+ Great care has to be taken to implement the algorithm correctly.
+ The reward is an enormous reduction in computational time.
+ For example, if an accuracy of 
+\begin_inset Formula $10^{-12}$
+\end_inset
+
+ is required, algorithms 1 and 2 would require extremely small steps of
+ the order of 0.06 Km to hope to achieve the result.
+ Algorithm 3 would require a step size of between 5 and 10 Km.
+ But algorithm 4 would require a step size of 20 Km, thus reducing the computati
+on by a further factor of 3.
+ 
+\end_layout
+
+\end_body
+\end_document

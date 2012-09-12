@@ -1,0 +1,512 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass literate-article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.25cm
+\topmargin 1.25cm
+\rightmargin 1.25cm
+\bottommargin 1.5cm
+\headheight 1.25cm
+\headsep 1.25cm
+\footskip 1.25cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Literate Programming
+\begin_inset Newline newline
+\end_inset
+
+(extra credit)
+\end_layout
+
+\begin_layout Author
+Swapnil Basak
+\begin_inset Newline newline
+\end_inset
+
+EE11B122
+\begin_inset Newline newline
+\end_inset
+
+IIT Madras
+\end_layout
+
+\begin_layout Part*
+Abstract
+\end_layout
+
+\begin_layout Standard
+This report briefly discusses and demonstrates literate programming with
+ C.
+ The problem statement is to make a singly linked list, with each node containin
+g 2 integer attributes.
+ They should be displayed in reverse order and memory deallocated when the
+ program ends.
+ 
+\end_layout
+
+\begin_layout Part*
+Code
+\end_layout
+
+\begin_layout Standard
+First we code in the routine header files,
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+#include<stdio.h>
+\end_layout
+
+\begin_layout Scrap
+
+#include<stdlib.h>
+\end_layout
+
+\begin_layout Scrap
+
+#include<assert.h>
+\end_layout
+
+\begin_layout Scrap
+
+@
+\end_layout
+
+\begin_layout Standard
+We include assert.h because of assert().
+ Before we get to the functions, let us look at the structure definitions.
+ This program is mainly split into three main functions each doing one task.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+typedef struct Node { 	
+\begin_inset Newline newline
+\end_inset
+
+int a; 	
+\begin_inset Newline newline
+\end_inset
+
+int b; 	
+\begin_inset Newline newline
+\end_inset
+
+struct Node *next;
+\begin_inset Newline newline
+\end_inset
+
+ }Node;
+\begin_inset Newline newline
+\end_inset
+
+typedef struct List { 
+\begin_inset Newline newline
+\end_inset
+
+Node *head; 
+\begin_inset Newline newline
+\end_inset
+
+int count; 
+\begin_inset Newline newline
+\end_inset
+
+}List;
+\begin_inset Newline newline
+\end_inset
+
+int len;
+\begin_inset Newline newline
+\end_inset
+
+@ 
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Standard
+We declare the Node structure defines each node of the linked list dynamically.
+ The list structure helps us keep track of which node to start with.
+ If we did not have the list struct, we would lose the head Node's address
+ and thus have no way of working our way through the linked list.
+ We typedef them for better readability and convenience.
+\end_layout
+
+\begin_layout Standard
+We shall now start declaring the functions.
+ We declare and code them in the order that we use them.
+ We will first add nodes to the list, then print the list, then delete the
+ list as mentioned in the problem statement.
+ Here is the add() function
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+void add(List *list,Node *node){
+\begin_inset Newline newline
+\end_inset
+
+     list->count++;
+\begin_inset Newline newline
+\end_inset
+
+ 	scanf("%d%d",&node->a,&node->b);
+\begin_inset Newline newline
+\end_inset
+
+ 	if(list->count!=len){
+\begin_inset Newline newline
+\end_inset
+
+ 		node->next=(Node *)malloc(sizeof(Node));
+\begin_inset Newline newline
+\end_inset
+
+ 		assert(node->next!=NULL);
+\begin_inset Newline newline
+\end_inset
+
+ 		add(list,node->next);
+\begin_inset Newline newline
+\end_inset
+
+ 	}
+\begin_inset Newline newline
+\end_inset
+
+ 	else
+\begin_inset Newline newline
+\end_inset
+
+ 		node->next=NULL;
+\begin_inset Newline newline
+\end_inset
+
+ }
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+The add function takes two arguements.
+ The *node points to the node that is added to the linked list and the *list
+ is so that we can increment it's count.
+ This is completely different from the previous program because here, the
+ iteration is in form of a recursion in the add() function itself.
+ The main() function has no loop to allocate memory as we will see later.
+ 
+\end_layout
+
+\begin_layout Standard
+Now we will look into the print() function that displays the linked list.
+ This iterates from *head to the last node and displays the two integer
+ attributes for each node.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+void print(Node *node){ 
+\begin_inset Newline newline
+\end_inset
+
+if(node)
+\begin_inset Newline newline
+\end_inset
+
+     {
+\begin_inset Newline newline
+\end_inset
+
+     printf("%d %d
+\backslash
+n",node->a,node->b);
+\begin_inset Newline newline
+\end_inset
+
+     print(node->next);
+\begin_inset Newline newline
+\end_inset
+
+     } 
+\begin_inset Newline newline
+\end_inset
+
+}
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We see that it recursively calls itself till it finds the last node.
+\end_layout
+
+\begin_layout Standard
+The delete function is similarly reccursive:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+void delete(List *list) {
+\begin_inset Newline newline
+\end_inset
+
+ Node *tmp = list->head;
+\begin_inset Newline newline
+\end_inset
+
+ if(tmp) {
+\begin_inset Newline newline
+\end_inset
+
+     list->head=tmp->next;
+\begin_inset Newline newline
+\end_inset
+
+     free(tmp);
+\begin_inset Newline newline
+\end_inset
+
+     delete(list);
+\begin_inset Newline newline
+\end_inset
+
+     } 
+\begin_inset Newline newline
+\end_inset
+
+}
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We have to be a little careful because if we delete the wrong pointer, we
+ can lose the chain that holds the list together.
+ Free() releases memory pointed to by the respective pointer.
+\end_layout
+
+\begin_layout Standard
+Finally, the main() function that mostly handles function calls and assigns
+ memory to the pointers.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+void main(){
+\begin_inset Newline newline
+\end_inset
+
+ List *list=(List *)malloc(sizeof(List));
+\begin_inset Newline newline
+\end_inset
+
+ 	list->count=0;
+\begin_inset Newline newline
+\end_inset
+
+ 	scanf("%d",&len);
+\begin_inset Newline newline
+\end_inset
+
+ 	Node *new=(Node *)malloc(sizeof(Node));
+\begin_inset Newline newline
+\end_inset
+
+ 	add(list,new);
+\begin_inset Newline newline
+\end_inset
+
+ 	print(new);
+\begin_inset Newline newline
+\end_inset
+
+ 	delete(list);
+\begin_inset Newline newline
+\end_inset
+
+ 	free(list);
+\begin_inset Newline newline
+\end_inset
+
+}
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Points to notice in the above function:
+\end_layout
+
+\begin_layout Itemize
+There is no loop in the function.
+ The iteration is carried out in the form of recursion in the add() function
+ itself.
+\end_layout
+
+\begin_layout Itemize
+This is also done to preseve the 'new' node in the main().
+ This enables us to recursively iterate again in the print() function.
+ Otherwise, 'new' would point to the last node and we would have no way
+ of finding our way back.
+\end_layout
+
+\begin_layout Subsection*
+Sample input:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+4 
+\begin_inset Newline newline
+\end_inset
+
+1 2
+\begin_inset Newline newline
+\end_inset
+
+4 5
+\begin_inset Newline newline
+\end_inset
+
+7 2
+\begin_inset Newline newline
+\end_inset
+
+4 -5
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection*
+
+Sample Output:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+1 2
+\begin_inset Newline newline
+\end_inset
+
+4 5
+\begin_inset Newline newline
+\end_inset
+
+7 2
+\begin_inset Newline newline
+\end_inset
+
+4 -5
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\end_body
+\end_document
