@@ -125,7 +125,7 @@ First we code in the routine header files,
 
 \begin_layout Scrap
 
-#include<math.h>
+#include <math.h>
 \end_layout
 
 \begin_layout Scrap
@@ -152,6 +152,11 @@ Next, the datatype and variable decalarations:
 \begin_inset Newline newline
 \end_inset
 
+// The node structure
+\end_layout
+
+\begin_layout Scrap
+
 typedef struct node 
 \end_layout
 
@@ -172,7 +177,12 @@ struct node *next;
 
 \begin_layout Scrap
 
-int n1,n2,n3,n4;   
+// Node names cannot excede 5 characters
+\end_layout
+
+\begin_layout Scrap
+
+char n1[5],n2[5],n3[5],n4[5];   
 \end_layout
 
 \begin_layout Scrap
@@ -192,7 +202,21 @@ float value;
 
 \begin_layout Scrap
 
-FILE *fp; char buf[BUFLEN];
+\end_layout
+
+\begin_layout Scrap
+
+// Global declarations
+\end_layout
+
+\begin_layout Scrap
+
+FILE *fp;
+\end_layout
+
+\begin_layout Scrap
+
+char buf[BUFLEN];
 \end_layout
 
 \begin_layout Scrap
@@ -237,6 +261,11 @@ We also add the function declarations:
 <<code>>=
 \begin_inset Newline newline
 \end_inset
+
+// function declarations
+\end_layout
+
+\begin_layout Scrap
 
 void read(char**);
 \end_layout
@@ -356,6 +385,10 @@ s are added into the code.
 \begin_layout Scrap
 
 <<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// Main parser
 \end_layout
 
 \begin_layout Scrap
@@ -381,6 +414,11 @@ void read(char **argv)
 \begin_layout Scrap
 
   head=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+  // Read till EOF
 \end_layout
 
 \begin_layout Scrap
@@ -429,6 +467,11 @@ n")) == NULL )
 
 \begin_layout Scrap
 
+  	// pbuf needs to be NULL on after first call of strtok 		
+\end_layout
+
+\begin_layout Scrap
+
 	  pbuf=NULL;
 \end_layout
 
@@ -444,7 +487,12 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-      name=malloc(sizeof(a[0]));
+      // Name of the element       
+\end_layout
+
+\begin_layout Scrap
+
+	  name=malloc(sizeof(a[0]));
 \end_layout
 
 \begin_layout Scrap
@@ -454,7 +502,12 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-      if(!head)
+      // Check if this the first node     
+\end_layout
+
+\begin_layout Scrap
+
+	  if(!head)
 \end_layout
 
 \begin_layout Scrap
@@ -494,7 +547,12 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-      if(atof(a[1])>0&&atof(a[2])>0) 
+	// Check if atof[0] exists or it is a string
+\end_layout
+
+\begin_layout Scrap
+
+     if(atof(a[1])>=0&&atof(a[2])>=0)
 \end_layout
 
 \begin_layout Scrap
@@ -504,12 +562,12 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-	  node_buf->n1=atof(a[1]);
+	  strcpy(node_buf->n1,a[1]);
 \end_layout
 
 \begin_layout Scrap
 
-	  node_buf->n2=atof(a[2]);
+	  strcpy(node_buf->n2,a[2]);
 \end_layout
 
 \begin_layout Scrap
@@ -529,7 +587,18 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-    if(vccs_vcvs(name))
+    // Call utility functions to find the type of element.
+ Switch case implementation
+\end_layout
+
+\begin_layout Scrap
+
+    // will be better?           
+\end_layout
+
+\begin_layout Scrap
+
+	if(vccs_vcvs(name))
 \end_layout
 
 \begin_layout Scrap
@@ -544,12 +613,12 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-	  node_buf->n3=atof(a[3]);
+	  strcpy(node_buf->n3,a[3]);
 \end_layout
 
 \begin_layout Scrap
 
-	  node_buf->n4=atof(a[4]);
+	  strcpy(node_buf->n4,a[4]);
 \end_layout
 
 \begin_layout Scrap
@@ -594,12 +663,12 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-	  node_buf->n3=-1;
+	  strcpy(node_buf->n3,"-1");
 \end_layout
 
 \begin_layout Scrap
 
-	  node_buf->n4=-1;
+	  strcpy(node_buf->n4,"-1");
 \end_layout
 
 \begin_layout Scrap
@@ -644,12 +713,12 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-	  node_buf->n3=-1;
+	  strcpy(node_buf->n3,"-1");
 \end_layout
 
 \begin_layout Scrap
 
-	  node_buf->n4=-1;
+	  strcpy(node_buf->n4,"-1");
 \end_layout
 
 \begin_layout Scrap
@@ -699,7 +768,7 @@ n")) == NULL )
 
 \begin_layout Scrap
 
-					  		     }
+  // Necessary end conditions					  		     }
 \end_layout
 
 \begin_layout Scrap
@@ -736,6 +805,11 @@ The main, but elementary, print and delete functions are now written.
 \begin_inset Newline newline
 \end_inset
 
+// Prints all the nodes  	
+\end_layout
+
+\begin_layout Scrap
+
 void print(Node* head)
 \end_layout
 
@@ -752,6 +826,11 @@ void print(Node* head)
 \begin_layout Scrap
 
   temp=head;
+\end_layout
+
+\begin_layout Scrap
+
+  // traces the link list with temp
 \end_layout
 
 \begin_layout Scrap
@@ -776,7 +855,7 @@ void print(Node* head)
 
 \begin_layout Scrap
 
-	  printf("%s %d %d %d %d %f
+	  printf("%s %s %s %s %s %f
 \backslash
 n",temp->name,temp->n1,temp->n2,temp->n3,temp->n4,temp->value);
 \end_layout
@@ -798,7 +877,7 @@ n",temp->name,temp->n1,temp->n2,temp->n3,temp->n4,temp->value);
 
 \begin_layout Scrap
 
-	 printf("%s %d %d %s %f
+	 printf("%s %s %s %s %f
 \backslash
 n",temp->name,temp->n1,temp->n2,temp->depname,temp->value);
 \end_layout
@@ -820,7 +899,7 @@ n",temp->name,temp->n1,temp->n2,temp->depname,temp->value);
 
 \begin_layout Scrap
 
-	  printf("%s %d %d %f
+	  printf("%s %s %s %f
 \backslash
 n",temp->name,temp->n1,temp->n2,temp->value);
 \end_layout
@@ -843,6 +922,15 @@ n",temp->name,temp->n1,temp->n2,temp->value);
 \begin_layout Scrap
 
 }
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+// Frees memory
 \end_layout
 
 \begin_layout Scrap
@@ -919,6 +1007,20 @@ Utility Functions:
 \begin_inset Newline newline
 \end_inset
 
+// UTILITY FUNCTIONS
+\end_layout
+
+\begin_layout Scrap
+
+// Returns power based on char formatting
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
 double set_exp(char *power)
 \end_layout
 
@@ -959,7 +1061,7 @@ double set_exp(char *power)
 
 \begin_layout Scrap
 
-	   else if(*power=='k')
+  else if(*power=='k')
 \end_layout
 
 \begin_layout Scrap
@@ -969,7 +1071,7 @@ double set_exp(char *power)
 
 \begin_layout Scrap
 
-	   else if(*power=='m')
+  else if(*power=='m')
 \end_layout
 
 \begin_layout Scrap
@@ -998,13 +1100,23 @@ double set_exp(char *power)
 
 \begin_layout Scrap
 
+// Checks for R, L, C
+\end_layout
+
+\begin_layout Scrap
+
 int impedance(char *name) 
 \end_layout
 
 \begin_layout Scrap
 
-{ if(*name=='R'||*name=='L'||*name=='V'||*name=='C'||*name=='I'||*name=='r'||*na
-me=='l'||*name=='c'||*name=='v'||*name=='i')
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(*name=='R'||*name=='L'||*name=='V'||*name=='C'||*name=='I'||*name=='r'||*name
+=='l'||*name=='c'||*name=='v'||*name=='i')
 \end_layout
 
 \begin_layout Scrap
@@ -1030,6 +1142,15 @@ else return 0;
 \begin_layout Scrap
 
 }
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+// Checks for CCVS or CCCS
 \end_layout
 
 \begin_layout Scrap
@@ -1070,6 +1191,15 @@ int cccs_ccvs(char *name)
 \begin_layout Scrap
 
 }
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+// Checks for VCVS or VCCS
 \end_layout
 
 \begin_layout Scrap
@@ -1117,7 +1247,6 @@ int vccs_vcvs(char *name)
 \end_layout
 
 \begin_layout Subsection*
-
 Sample Input:
 \end_layout
 
@@ -1133,12 +1262,17 @@ C 2 3 5u
 
 \begin_layout Scrap
 
-R 1 2 3
+R 1a 2 3
 \end_layout
 
 \begin_layout Scrap
 
-L 1 2 5meg
+L 1a 2 5meg
+\end_layout
+
+\begin_layout Scrap
+
+G 1a 2 2 3 5k
 \end_layout
 
 \begin_layout Scrap
@@ -1156,15 +1290,20 @@ Sample Output:
 \begin_inset Newline newline
 \end_inset
 
-C 2 3 0.000005
+G 1a 2 2 3 5000
 \begin_inset Newline newline
 \end_inset
 
-R 1 2 3.000000
+L 1a 2 5000000
+\end_layout
+
+\begin_layout Scrap
+
+	 R 1a 2 3.000000
 \begin_inset Newline newline
 \end_inset
 
-L 1 2 500000
+C 2 3 0.500000
 \begin_inset Newline newline
 \end_inset
 
