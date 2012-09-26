@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include<math.h>
-
+#include <math.h>
+#include <complex.h>
 #define BUFLEN 256
 
 // The node structure
@@ -31,9 +31,11 @@ char *name,*power;
 char *word,*pbuf;
 char *a[6];
 int i,j,n,row;
+int sizeofR;
+struct hash_frag hash_table[50];
 
 // function declarations
-void hash_table(Node*);
+void make_hash_table(Node*);
 void read(char**);
 double set_exp(char*);		
 void print(Node*);
@@ -43,6 +45,8 @@ int cccs_ccvs(char*);
 int vccs_vcvs(char*);
 // Not used as of now
 int type(char*);
+void generate_matrix(int,int,Node*,int);
+int find_hash(char*);
 
 int main(int argc,char **argv)
 {	
@@ -134,7 +138,7 @@ void read(char **argv)
   // Necessary end conditions
   head->next=NULL;
   fclose(fp);
-  hash_table(head);
+  make_hash_table(head);
   print (head);
 }
 
@@ -233,9 +237,8 @@ int vccs_vcvs(char *name){
 // return 1;
 //}
 
-void hash_table(Node* node)
+void make_hash_table(Node* node)
 {
-  struct hash_frag hash_table[50];
   Node *tmp;
   tmp = node;
   int len=0;
@@ -262,11 +265,11 @@ void hash_table(Node* node)
 	break;      
       for(i=0;i<=count;i++)
 	{
-	 if(strcmp(hash_table[i].node_name,tmp->n1)==0)
+	  if(strcmp(hash_table[i].node_name,tmp->n1)==0)
 	    {
 	      exists_n1=1;
 	    }  
-         if(strcmp(hash_table[i].node_name,tmp->n2)==0)
+	  if(strcmp(hash_table[i].node_name,tmp->n2)==0)
 	    {
 	      exists_n2=1;
 	    }
@@ -291,21 +294,183 @@ void hash_table(Node* node)
   for(i=0;i<count;i++){
     printf("index=%d          name=%s\n",hash_table[i].index,hash_table[i].node_name);
   }
-  generate_matrix(count,count,tmp);
+  sizeofR=count;
+  tmp=node;
+  while(tmp!=NULL)
+    {
+      printf("Name is %s \n",tmp->name);
+      if(*(tmp->name)=='V'||*(tmp->name)=='v')
+	{
+	  printf("comes here");
+	  count++;
+	}
+      tmp= tmp->prev;
+    }
+  generate_matrix(count-1,sizeofR,node,1000);
 }
 
-void generate_matrix(int count,int elem, Node* node)
+void generate_matrix(int sizeofmat,int node_max,Node* node1,int w)
 {
   int i,j,k;
-  complex **G,*I1,**R;
-  G=malloc(count*sizeof(complex));
-  for(i=0;i<sizeofmat;i++)											
-	{
-		for(j=0;j<sizeofmat;j++)
-			G[i][j]=0;
-	}			
+  complex **G,*I1,**R;			
+  G=malloc(sizeofmat*sizeof(complex));	
+  for(i=0;i<sizeofmat;i++)
+    G[i]=malloc(sizeofmat*sizeof(complex));
+		
+  for(i=0;i<sizeofmat;i++)		
+    {
+      for(j=0;j<sizeofmat;j++)
+	G[i][j]=0;
+    }			
 	
-I1=malloc(sizeofmat*sizeof(complex));
-for(i=0;i<sizeofmat;i++)
-*(I1+i)=0; 
+  I1=malloc(sizeofmat*sizeof(complex));	
+	
+  for(i=0;i<sizeofmat;i++)		
+    *(I1+i)=0;
+	
+  R=malloc(node_max*sizeof(complex));	
+  for(i=0;i<node_max;i++)		
+    R[i]=malloc(sizeofmat*sizeof(complex));
+		
+  Node *node2=(Node*)malloc(sizeof(Node));						
+	
+  node2=node1;										
+	
+  while(node1)														
+    {
+      if(*(node1->name)=='R')
+	{
+	  j=find_hash(node1->n1);
+	  k=find_hash(node1->n2);
+	  R[j][k]=node1->value;								
+	  R[k][j]=node1->value;								
+	}	
+				
+      else if(*(node1->name)=='L')
+	{
+	  j=find_hash(node1->n1);
+	  k=find_hash(node1->n2);
+			
+	  R[j][k]=I*w*node1->value;
+	  R[k][j]=I*w*node1->value;
+	}
+		
+      else if(*(node1->name)=='C')
+	{
+	  j=find_hash(node1->n1);
+	  k=find_hash(node1->n2);
+			
+	  R[j][k]=1.0/(I*w*node1->value);
+	  R[k][j]=1.0/(I*w*node1->value);
+	}
+				
+      node1=node1->prev;	
+    }			 
+	
+  for(i=0;i<node_max-1;i++)								
+    {
+      for(j=0;j<i+1;j++)
+	{
+	  if(i==j)							
+	    {
+	      for(k=0;k<node_max;k++)
+		{
+		  if(R[i][k]!=0)							
+		    G[i][j]+=1.0/R[i][k];
+							
+		}
+	    }
+	  else
+	    {
+	      if(R[i][j]!=0)	
+		{
+		  G[i][j]=-1/R[i][j];									
+		  G[j][i]=G[i][j];					
+		}
+	      else
+		{
+		  G[i][j]=0;								
+		  G[j][i]=0;
+		}	
+	    }	
+	}
+    }	
+	
+  node1=node2;										
 
+  i=0;
+	
+  while(node2)										
+    {											
+      if(*(node2->name)=='V')								
+	{										
+	  j=find_hash(node2->n1);
+	  k=find_hash(node2->n2);
+			
+	  G[node_max+i-1][k]=-1;
+	  G[k][node_max+i-1]=-1;	
+			
+	  I1[node_max+i-1]=node2->value;
+					
+	  i++;
+	}
+      node2=node2->prev;
+    }
+	
+  node2=node1;
+	
+  while(node1)				
+    {
+      if(*(node1->name)=='I')
+	{
+	  j=find_hash(node1->n1);
+	  k=find_hash(node1->n2);
+			
+	  if(i<node_max-1)
+	    I1[i]+=node1->value;	
+			
+	  if(j<node_max-1)
+	    I1[j]+=-1*node1->value;
+	}	
+      node1=node1->prev;
+    }
+				
+  printf("Here is your matrix in the form G*V=I:\n");
+	
+  for(i=0;i<sizeofmat;i++)
+    {
+      printf("|");
+		
+      for(j=0;j<sizeofmat;j++)
+	printf("%4.2f+%4.2fi\t",creal(G[i][j]),cimag(G[i][j]));
+				
+      printf("||");
+		
+      if(i<node_max-1)
+	printf("V%d|",i+1);
+      else
+	printf("I%d|",i-node_max+2);		
+		
+      printf("\t");
+		
+      printf("|%4.2f+%4.2fi|\n",creal(I1[i]),cimag(I1[i]));
+    }	
+			
+	
+  free(R);				
+  free(G);
+  free(I1);
+}		
+
+
+int find_hash(char* name)
+{
+  for(i=0;i<sizeofR;i++)
+    {
+      if(strcmp(hash_table[i].node_name,name)==0)
+	{
+	  return i;
+	}
+    }
+  return 0;
+}
