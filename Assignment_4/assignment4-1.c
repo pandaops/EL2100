@@ -148,6 +148,7 @@ void print(Node* head)
   Node *temp=(Node*)malloc(sizeof(Node));
   temp=head;
   // traces the link list with temp
+  printf("\nNode details : \n\n");
   while(temp)
     {
       if(vccs_vcvs(temp->name))
@@ -290,18 +291,18 @@ void make_hash_table(Node* node)
       exists_n1=0;
       exists_n2=0;
     }
-  printf("Generated Hash Table \n");
+  printf("\nGenerated Hash Table \n\n");
+  printf("+------------------+\n");
   for(i=0;i<count;i++){
-    printf("index=%d          name=%s\n",hash_table[i].index,hash_table[i].node_name);
-  }
+    printf("|index=%d | name=%s|\n",hash_table[i].index,hash_table[i].node_name);
+     }
+  printf("+------------------+\n\n");
   sizeofR=count;
   tmp=node;
   while(tmp!=NULL)
     {
-      printf("Name is %s \n",tmp->name);
       if(*(tmp->name)=='V'||*(tmp->name)=='v')
 	{
-	  printf("comes here");
 	  count++;
 	}
       tmp= tmp->prev;
