@@ -5,6 +5,34 @@
 #include <complex.h>
 #define BUFLEN 256
 
+/*******************************************************************************
+ *                                                                             
+ * This is a program that handles and analyzes a electrical circuit. It involves 
+ * three different steps/modules.  
+ * 
+ * PART 1
+ *
+ * It first parses a text file for information on the circuit and then converts 
+ * verbose inputs to numerical ones. A restriction on the number of characters
+ * that a node can contain is restricted(=5). This module mainly improves UI and
+ * allows for quick and readable input.
+ *
+ * PART 2
+ * 
+ * It then forms a hash table to index node names, which also accounts for 
+ * alphanumeric node names. It then returns the respective index to part 3, which
+ * uses it to make the conductance matrix.
+ *
+ * PART 3
+ * 
+ * This is main purpose of this program. It calls part 2 for each element it finds
+ * and correspondingly adds the value to the matrix cell. It then compiles the
+ * resultant matrix with other details such as independent voltage sources
+ * and current sources. It outputs the Conductance Matrix and the Current Matrix 
+ * in the equation G*V=I, using standard sign conventions.
+ *                                                                           
+ ******************************************************************************/
+ 
 // The node structure
 typedef struct node
 {
@@ -96,8 +124,7 @@ void read(char **argv)
 	}
       else
 	printf("Negative indexes not supported"); 
-      // Call utility functions to find the type of element. Switch case implementation 
-      // will be better?     
+// Check for type of dependence - current or voltage
       if(vccs_vcvs(name))
 	{
 	  strcpy(node_buf->name,name);  
@@ -118,6 +145,7 @@ void read(char **argv)
 	  sscanf(a[4],"%*f%s",power);
 	  node_buf->value=atof(a[4])*set_exp(power);
 	}		
+	// Check if impedance
       else if(impedance(name)) 
 	{
 	  strcpy(node_buf->name,name);   
@@ -252,12 +280,15 @@ int vccs_vcvs(char *name){
  
 }
 
+// Makes hash table for the input
+
 void make_hash_table(Node* node)
 {
   Node *tmp;
   tmp = node;
   int len=0;
   int count=0;
+  // Total no of elements
   for(len=1;;)
     {
       tmp=tmp->prev;
@@ -265,6 +296,7 @@ void make_hash_table(Node* node)
       if(tmp->prev==NULL)
 	break;
     }
+  // Initialisation  
   for(i=0;i<50;i++)
     {
       strcpy(hash_table[i].node_name,"0");
@@ -273,6 +305,8 @@ void make_hash_table(Node* node)
   int exists_n1=0;  
   int exists_n2=0;  
   tmp=node;
+  // hashing function
+  // Assign index to node name if not already present
   for(j=0;j<len;j++)
     {  
       if(tmp==NULL)
@@ -304,6 +338,7 @@ void make_hash_table(Node* node)
       exists_n1=0;
       exists_n2=0;
     }
+    // Output
   printf("\nGenerated Hash Table \n\n");
   printf("+------------------+\n");
   for(i=0;i<count;i++){
@@ -318,8 +353,26 @@ void make_hash_table(Node* node)
 	count++;
       tmp= tmp->prev;
     }
+      
   generate_matrix(count-1,sizeofimp_mat,node,1000);
 }
+
+/*******************************************************************************
+ *                                                                             
+ * This is the main function of the program. It does the following:
+ * 
+ * It initializes three matrices based on input size. 
+ * con_mat = Conductance Matrix
+ * cur_mat = Current Matrix
+ * imp_map = Impedance Matrix (con_mat^-1)
+ *                                     
+ * -> It first forms the Impedance Matrix usind nodal analyis.
+ * -> It then checks for voltage sources and adds current variables correspodingly
+ * -> It checks for current sources and adds them to the current matrix
+ * 
+ * The above is done with the find_hash() function which returns the index
+ * for the respective node_name.                                     
+ ******************************************************************************/
 
 void generate_matrix(int sizeofmat,int node_max,Node* node1,int w)
 {
