@@ -69,8 +69,6 @@ void delete(Node*);
 int impedance(char*);
 int cccs_ccvs(char*);
 int vccs_vcvs(char*);
-// Not used as of now
-int type(char*);
 void generate_matrix(int,int,Node*,int);
 int find_hash(char*);
 
