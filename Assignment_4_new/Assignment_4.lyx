@@ -1,0 +1,1381 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass literate-article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.25cm
+\topmargin 1.25cm
+\rightmargin 1.25cm
+\bottommargin 1.5cm
+\headheight 1.25cm
+\headsep 1.25cm
+\footskip 1.25cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Spice Text Parser
+\end_layout
+
+\begin_layout Author
+Swapnil Basak
+\begin_inset Newline newline
+\end_inset
+
+EE11B122
+\begin_inset Newline newline
+\end_inset
+
+IIT Madras
+\end_layout
+
+\begin_layout Part*
+Abstract
+\end_layout
+
+\begin_layout Standard
+This report briefly discusses and demonstrates text parsing with C.
+ The problem statement is to make a doubly linked list to store information
+ about each electrical component provided.
+ This has to be done from a text file.
+ Other numeric and alphanumeric modifications hav eto be done.
+\end_layout
+
+\begin_layout Part*
+Code
+\end_layout
+
+\begin_layout Standard
+First we code in the routine header files,
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+#include <stdlib.h> 
+\end_layout
+
+\begin_layout Scrap
+
+#include <stdio.h> 
+\end_layout
+
+\begin_layout Scrap
+
+#include <string.h> 
+\end_layout
+
+\begin_layout Scrap
+
+#include <math.h>
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+#define BUFLEN 256
+\end_layout
+
+\begin_layout Scrap
+
+@
+\end_layout
+
+\begin_layout Standard
+Next, the datatype and variable decalarations:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// The node structure
+\end_layout
+
+\begin_layout Scrap
+
+typedef struct node 
+\end_layout
+
+\begin_layout Scrap
+
+{   
+\end_layout
+
+\begin_layout Scrap
+
+struct node *prev;   
+\end_layout
+
+\begin_layout Scrap
+
+struct node *next;   
+\end_layout
+
+\begin_layout Scrap
+
+// Node names cannot excede 5 characters
+\end_layout
+
+\begin_layout Scrap
+
+char n1[5],n2[5],n3[5],n4[5];   
+\end_layout
+
+\begin_layout Scrap
+
+char *depname,name[3];   
+\end_layout
+
+\begin_layout Scrap
+
+float value; 
+\end_layout
+
+\begin_layout Scrap
+
+}Node;
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+// Global declarations
+\end_layout
+
+\begin_layout Scrap
+
+FILE *fp;
+\end_layout
+
+\begin_layout Scrap
+
+char buf[BUFLEN];
+\end_layout
+
+\begin_layout Scrap
+
+// holds line 
+\end_layout
+
+\begin_layout Scrap
+
+char *name,*power; 
+\end_layout
+
+\begin_layout Scrap
+
+char *word,*pbuf; 
+\end_layout
+
+\begin_layout Scrap
+
+char *a[6]; 
+\end_layout
+
+\begin_layout Scrap
+
+int i,j,n,row;
+\begin_inset Newline newline
+\end_inset
+
+@ 
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Standard
+We also add the function declarations:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// function declarations
+\end_layout
+
+\begin_layout Scrap
+
+void read(char**);
+\end_layout
+
+\begin_layout Scrap
+
+double set_exp(char*);		 
+\end_layout
+
+\begin_layout Scrap
+
+void print(Node*); 
+\end_layout
+
+\begin_layout Scrap
+
+void delete(Node*); 
+\end_layout
+
+\begin_layout Scrap
+
+int impedance(char*); 
+\end_layout
+
+\begin_layout Scrap
+
+int cccs_ccvs(char*); 
+\end_layout
+
+\begin_layout Scrap
+
+int vccs_vcvs(char*); 
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Our Main function:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+int main(int argc,char **argv) 
+\end_layout
+
+\begin_layout Scrap
+
+{	   
+\end_layout
+
+\begin_layout Scrap
+
+if( argc<2 )      
+\begin_inset Newline newline
+\end_inset
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+      printf("Usage: ./a.out filename
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+  	exit(1);     
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+  read(argv);
+\end_layout
+
+\begin_layout Scrap
+
+  return(1);
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\begin_inset Newline newline
+\end_inset
+
+@
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The main parser function is now written.
+ This is just a skeleton and a better one will be written as more functionalitie
+s are added into the code.
+ We use a scanindex to apply different processes to a node depending upon
+ its type.
+ Scanindex is different for different types as shown below.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// Main parser
+\end_layout
+
+\begin_layout Scrap
+
+void read(char **argv)
+\end_layout
+
+\begin_layout Scrap
+
+ {
+\end_layout
+
+\begin_layout Scrap
+
+  fp=fopen(argv[1],"r");
+\end_layout
+
+\begin_layout Scrap
+
+  Node *head=(Node*)malloc(sizeof(Node));
+\end_layout
+
+\begin_layout Scrap
+
+  head=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+  while(fgets(buf,BUFLEN-1,fp))
+\end_layout
+
+\begin_layout Scrap
+
+	fp=fopen(argv[1],"r");
+\end_layout
+
+\begin_layout Scrap
+
+    Node *head=(Node*)malloc(sizeof(Node));
+\end_layout
+
+\begin_layout Scrap
+
+    head=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+  // Read till EOF
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+      for( n=0,pbuf=buf ; n<100 ; n++ )
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  if( (word=strtok(pbuf," 
+\backslash
+t
+\backslash
+n")) == NULL )
+\end_layout
+
+\begin_layout Scrap
+
+	    break;
+\end_layout
+
+\begin_layout Scrap
+
+	  a[n]=malloc(sizeof(word));
+\end_layout
+
+\begin_layout Scrap
+
+	  a[n]=word;
+\end_layout
+
+\begin_layout Scrap
+
+  	// pbuf needs to be NULL on after first call of strtok 		
+\end_layout
+
+\begin_layout Scrap
+
+	  pbuf=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+      // Check if this the first node     
+\end_layout
+
+\begin_layout Scrap
+
+	  if(!head)
+\end_layout
+
+\begin_layout Scrap
+
+		node_buf->prev=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+      else
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  node_buf->prev=head;
+\end_layout
+
+\begin_layout Scrap
+
+	  head->next=node_buf;
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+    name=a[0];
+\end_layout
+
+\begin_layout Scrap
+
+	strcpy(node_buf->n1,a[1]);
+\end_layout
+
+\begin_layout Scrap
+
+	strcpy(node_buf->n2,a[2]);
+\end_layout
+
+\begin_layout Scrap
+
+    
+\end_layout
+
+\begin_layout Scrap
+
+	// Call utility functions to find the type of element.
+\end_layout
+
+\begin_layout Scrap
+
+	int scanindex=0;          
+\end_layout
+
+\begin_layout Scrap
+
+	if(vccs_vcvs(name))
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  scanindex=5;
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+    else if(cccs_ccvs(name))
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  scanindex=4;		
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+    else if(impedance(name))
+\end_layout
+
+\begin_layout Scrap
+
+ 	{
+\end_layout
+
+\begin_layout Scrap
+
+	  scanindex=3;
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+       else
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+      printf("Invalid input");
+\end_layout
+
+\begin_layout Scrap
+
+	  exit(0);
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+ 	if (scanindex==5)
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  strcpy(node_buf->n3,a[scanindex-2]);
+\end_layout
+
+\begin_layout Scrap
+
+	  strcpy(node_buf->n4,a[scanindex-1]);
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+      else
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  strcpy(node_buf->n3,"NULL");
+\end_layout
+
+\begin_layout Scrap
+
+	  strcpy(node_buf->n4,"NULL");
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+        if (scanindex==4)
+\end_layout
+
+\begin_layout Scrap
+
+	node_buf->depname=a[scanindex-1];
+\end_layout
+
+\begin_layout Scrap
+
+      else
+\end_layout
+
+\begin_layout Scrap
+
+        node_buf->depname=" ";
+\end_layout
+
+\begin_layout Scrap
+
+      // Exponent operations
+\end_layout
+
+\begin_layout Scrap
+
+      power = malloc(sizeof(a[scanindex]));
+\end_layout
+
+\begin_layout Scrap
+
+      sscanf(a[scanindex],"%*f%s",power);
+\end_layout
+
+\begin_layout Scrap
+
+      node_buf->value=atof(a[scanindex])*set_exp(power);
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+  *power=' ';
+\end_layout
+
+\begin_layout Scrap
+
+  head=node_buf;
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+ // Necessary end conditions					  		     }
+\end_layout
+
+\begin_layout Scrap
+
+  head->next=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+  fclose(fp);
+\end_layout
+
+\begin_layout Scrap
+
+  print (head);
+\end_layout
+
+\begin_layout Scrap
+
+}
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+The main, but elementary, print and delete functions are now written.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// Prints all the nodes  	
+\end_layout
+
+\begin_layout Scrap
+
+void print(Node* head)
+\end_layout
+
+\begin_layout Scrap
+
+{   
+\end_layout
+
+\begin_layout Scrap
+
+  Node *temp=(Node*)malloc(sizeof(Node));
+\end_layout
+
+\begin_layout Scrap
+
+  temp=head;
+\end_layout
+
+\begin_layout Scrap
+
+  // traces the link list with temp
+\end_layout
+
+\begin_layout Scrap
+
+  while(temp)
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+      if(vccs_vcvs(temp->name))
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  printf("%s %s %s %s %s %f
+\backslash
+n",temp->name,temp->n1,temp->n2,temp->n3,temp->n4,temp->value);
+\end_layout
+
+\begin_layout Scrap
+
+	}	 	
+\end_layout
+
+\begin_layout Scrap
+
+	else if(cccs_ccvs(temp->name))
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	 printf("%s %s %s %s %f
+\backslash
+n",temp->name,temp->n1,temp->n2,temp->depname,temp->value);
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+	else if(impedance(temp->name))
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  printf("%s %s %s %f
+\backslash
+n",temp->name,temp->n1,temp->n2,temp->value);
+\end_layout
+
+\begin_layout Scrap
+
+	}	 			
+\end_layout
+
+\begin_layout Scrap
+
+      temp=temp->prev;
+\end_layout
+
+\begin_layout Scrap
+
+    } 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+// Frees memory
+\end_layout
+
+\begin_layout Scrap
+
+void delete(Node* head) 
+\end_layout
+
+\begin_layout Scrap
+
+{   
+\end_layout
+
+\begin_layout Scrap
+
+  Node *temp;
+\end_layout
+
+\begin_layout Scrap
+
+  temp=head;
+\end_layout
+
+\begin_layout Scrap
+
+  while(temp)
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+      head=temp;
+\end_layout
+
+\begin_layout Scrap
+
+      temp=temp->prev;
+\end_layout
+
+\begin_layout Scrap
+
+      free(head);
+\end_layout
+
+\begin_layout Scrap
+
+    } 	
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This concludes the code for the first assignment.
+ The utility functions that we use throughout the code:
+\end_layout
+
+\begin_layout Subsection*
+Utility Functions:
+\end_layout
+
+\begin_layout Standard
+We use the following utility functions to see if the component is an inpedance,
+ ccvs etc.
+ We also use a utlity that returns the respective mathematical number for
+ the exponential representations.
+ All of these use switch cases.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>= 
+\begin_inset Newline newline
+\end_inset
+
+// UTILITY FUNCTIONS
+\end_layout
+
+\begin_layout Scrap
+
+// Returns power based on char formatting
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+double set_exp(char *power)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+   if (strcmp(power,"meg")==0)
+\end_layout
+
+\begin_layout Scrap
+
+    return pow(10,6);
+\end_layout
+
+\begin_layout Scrap
+
+  switch(*power)
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+    case 'n': return pow(10,-9);
+\end_layout
+
+\begin_layout Scrap
+
+    case 'k': return pow(10,3);
+\end_layout
+
+\begin_layout Scrap
+
+    case 'm': return pow(10,-3);
+\end_layout
+
+\begin_layout Scrap
+
+    case 'u': return pow(10,-6);
+\end_layout
+
+\begin_layout Scrap
+
+    default: return 1;
+\end_layout
+
+\begin_layout Scrap
+
+      } 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+// Checks for R, L, C
+\end_layout
+
+\begin_layout Scrap
+
+int impedance(char *name)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+  switch(*name)
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+    case 'R':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'L':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'C':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'V':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'I':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'r':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'l':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'c':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'v':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'i': return 1;
+\end_layout
+
+\begin_layout Scrap
+
+    default: return 0;
+\end_layout
+
+\begin_layout Scrap
+
+      } 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+// Checks for CCVS or CCCS
+\end_layout
+
+\begin_layout Scrap
+
+int cccs_ccvs(char *name)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+  switch(*name)
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+    case 'H':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'F':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'h':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'f': return 1;
+\end_layout
+
+\begin_layout Scrap
+
+    default: return 0;
+\end_layout
+
+\begin_layout Scrap
+
+      }
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+// Checks for VCVS or VCCS
+\end_layout
+
+\begin_layout Scrap
+
+int vccs_vcvs(char *name)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+  switch(*name)
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+    case 'E':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'G':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'e':
+\end_layout
+
+\begin_layout Scrap
+
+    case 'g': return 1;
+\end_layout
+
+\begin_layout Scrap
+
+    default: return 0;
+\end_layout
+
+\begin_layout Scrap
+
+      }
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection*
+Sample Input:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+C 2 3 5u 
+\end_layout
+
+\begin_layout Scrap
+
+R 1a 2 3
+\end_layout
+
+\begin_layout Scrap
+
+L 1a 2 5meg
+\end_layout
+
+\begin_layout Scrap
+
+G 1 2 3 1a 5k
+\end_layout
+
+\begin_layout Scrap
+
+@
+\end_layout
+
+\begin_layout Subsection*
+Sample Output:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+G 1 2 3 1a 5000.000000
+\begin_inset Newline newline
+\end_inset
+
+C 2 3 0.000005
+\begin_inset Newline newline
+\end_inset
+
+R 1a 2 3.000000
+\begin_inset Newline newline
+\end_inset
+
+L 1a 2 500000
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\end_body
+\end_document
