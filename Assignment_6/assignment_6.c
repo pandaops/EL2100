@@ -35,14 +35,14 @@
  *  
  * It finds the co-factor for each entry [i][j]. It stores the values of the
  * cofactor of [i][j] in another similar martix. It then finds the inverse of
- * the matrix using the cofactor identity and calls the gaussian_determinant function
- * recursively.
+ * the matrix using the cofactor identity and calls the gaussian_determinant 
+ * function recursively.
  *
  * PART 5
  *       
- * This calls the gaussian_determinant function in accordance to the algorithm of gaussian
- * elimination. Finally, the inverse of the matrix is found, multiplied with the
- * original cur_mat and displayed.
+ * This calls the gaussian_determinant function in accordance to the algorithm of 
+ * gaussian elimination. Finally, the inverse of the matrix is found, multiplied 
+ * with the original cur_mat and displayed.
  *
  *
  * -Swapnil Basak
@@ -370,6 +370,26 @@ void make_hash_table(Node* node)
       
   generate_matrix(count-1,sizeofimp_mat,node,1000);
 }
+
+
+ /*****************************************************************************
+ * The following part of the program has three utility functions and does
+ * three main functions: 
+ * 
+ * It finds the co-factor for each entry [i][j]. It stores the values of the
+ * cofactor of [i][j] in another similar martix. 
+ *
+ * It then finds the inverse of
+ * the matrix using the cofactor identity and calls the gaussian_determinant 
+ * function recursively.
+ *      
+ * This calls the gaussian_determinant function in accordance to the algorithm of 
+ * gaussian elimination. Finally, the inverse of the matrix is found, multiplied 
+ * with the original cur_mat and displayed.
+ *                                                              
+ ******************************************************************************/
+
+
 
 complex gaussian_determinant(complex **con_mat,int sizeofmat )									
 {
@@ -707,7 +727,8 @@ void generate_matrix(int sizeofmat,int node_max,Node* node1,int w)
   free(ans_mat);
   free(inverse);
 }
-		
+	
+// Utility function to lookup hash table	
 int find_hash(char* name)
 {
   for(i=0;i<sizeofimp_mat;i++)
