@@ -35,12 +35,12 @@
  *  
  * It finds the co-factor for each entry [i][j]. It stores the values of the
  * cofactor of [i][j] in another similar martix. It then finds the inverse of
- * the matrix using the cofactor identity and calls the guassian_determinant function
+ * the matrix using the cofactor identity and calls the gaussian_determinant function
  * recursively.
  *
  * PART 5
  *       
- * This calls the guassian_determinant function in accordance to the algorithm of gaussian
+ * This calls the gaussian_determinant function in accordance to the algorithm of gaussian
  * elimination. Finally, the inverse of the matrix is found, multiplied with the
  * original cur_mat and displayed.
  *
@@ -371,39 +371,39 @@ void make_hash_table(Node* node)
   generate_matrix(count-1,sizeofimp_mat,node,1000);
 }
 
-complex guassian_determinant(complex **a,int k )									
+complex gaussian_determinant(complex **con_mat,int sizeofmat )									
 {
-	float s=1;
-	complex	det=0,**b;
+	float parity=1;
+	complex	value=0,**b;
 	int i,j,m,n,c;
 	
-	b=malloc((k)*sizeof(complex));								
-	for(i=0;i<k;i++)
-		b[i]=malloc(k*sizeof(complex));
+	b=malloc((sizeofmat)*sizeof(complex));								
+	for(i=0;i<sizeofmat;i++)
+		b[i]=malloc(sizeofmat*sizeof(complex));
 	
-	if(k==1)
+	if(sizeofmat==1)
 	{
-		return(a[0][0]);
+		return(con_mat[0][0]);
 	}
 	else
 	{
-		det=0;
-		for(c=0;c<k;c++)
+		value=0;
+		for(c=0;c<sizeofmat;c++)
 		{
 			m=0;
 			n=0;
 
-			for(i=0;i<k;i++)
+			for(i=0;i<sizeofmat;i++)
 			{
-				for(j=0;j<k;j++)
+				for(j=0;j<sizeofmat;j++)
 				{
 					b[i][j]=0;
 
 					if(i!=0&&j!=c)
 					{
-						b[m][n]=a[i][j];
+						b[m][n]=con_mat[i][j];
 
-						if(n<k-2)
+						if(n<sizeofmat-2)
 							n++;
 						else
 						{
@@ -413,78 +413,78 @@ complex guassian_determinant(complex **a,int k )
 					}
 				}
 			}
-			det=det+s*(a[0][c]*guassian_determinant(b,k-1));				
-			s=-1*s;
+			value=value+parity*(con_mat[0][c]*gaussian_determinant(b,sizeofmat-1));				
+			parity=-1*parity;
 		}
 	}
-	return(det);												
+	return(value);												
 }
 
-complex** find_inverse(complex **num,complex **fac,int r)				
+complex** find_inverse(complex **con_mat,complex **gauss_factors,int sizeofmat)				
 {
 	int i,j;
-	complex **b,**inv,d;
+	complex **b,**inverse,d;
 	
-	b=malloc((r)*sizeof(complex));								
-	for(i=0;i<r;i++)
-		b[i]=malloc(r*sizeof(complex));
+	b=malloc((sizeofmat)*sizeof(complex));								
+	for(i=0;i<sizeofmat;i++)
+		b[i]=malloc(sizeofmat*sizeof(complex));
 		
-	inv=malloc((r)*sizeof(complex));								
-	for(i=0;i<r;i++)
-		inv[i]=malloc(r*sizeof(complex));	
+	inverse=malloc((sizeofmat)*sizeof(complex));								
+	for(i=0;i<sizeofmat;i++)
+		inverse[i]=malloc(sizeofmat*sizeof(complex));	
 	
-	for(i=0;i<r;i++)
+	for(i=0;i<sizeofmat;i++)
 	{
-		for(j=0;j<r;j++)
+		for(j=0;j<sizeofmat;j++)
 		{
-			b[i][j]=fac[j][i];
+			b[i][j]=gauss_factors[j][i];
 		}
 	}
 	
-	d=guassian_determinant(num,r);
+	d=gaussian_determinant(con_mat,sizeofmat);
 	
-	for(i=0;i<r;i++)
+	for(i=0;i<sizeofmat;i++)
 	{
-		for(j=0;j<r;j++)
+		for(j=0;j<sizeofmat;j++)
 		{
-			inv[i][j]=b[i][j]/d;
+			inverse[i][j]=b[i][j]/d;
 		}
 	}
-	return inv;													
+	return inverse;													
 }
-complex** cofactor(complex **num,int f)							
+complex** cofactor(complex **con_mat,int sizeofmat)							
 {
-	complex **fac,**b,**inv;
+	complex **gauss_factors,**b,**inverse;
 	int p,q,m,n,i,j;
 	
-	fac=malloc((f)*sizeof(complex));								
-	for(i=0;i<f;i++)
-		fac[i]=malloc(f*sizeof(complex));
+	gauss_factors=malloc((sizeofmat)*sizeof(complex));								
+	for(i=0;i<sizeofmat;i++)
+		gauss_factors[i]=malloc(sizeofmat*sizeof(complex));
 		
-	b=malloc((f)*sizeof(complex));								
-	for(i=0;i<f;i++)
-		b[i]=malloc(f*sizeof(complex));
+	b=malloc((sizeofmat)*sizeof(complex));								
+	for(i=0;i<sizeofmat;i++)
+		b[i]=malloc(sizeofmat*sizeof(complex));
 		
-	inv=malloc((f)*sizeof(complex));								
-	for(i=0;i<f;i++)
-		inv[i]=malloc(f*sizeof(complex));	
+	inverse=malloc((sizeofmat)*sizeof(complex));								
+	for(i=0;i<sizeofmat;i++)
+		inverse[i]=malloc(sizeofmat*sizeof(complex));	
 	
-	for(q=0;q<f;q++)
+	for(q=0;q<sizeofmat;q++)
 	{
-		for(p=0;p<f;p++)
+		for(p=0;p<sizeofmat;p++)
 		{
 			m=0;
 			n=0;
-			for(i=0;i<f;i++)
+			for(i=0;i<sizeofmat;i++)
 			{
-				for(j=0;j<f;j++)
+				for(j=0;j<sizeofmat;j++)
 				{
 					b[i][j]=0;
 					if(i!=q&&j!=p)
 					{
-						b[m][n]=num[i][j];
+						b[m][n]=con_mat[i][j];
 						
-						if(n<(f-2))
+						if(n<(sizeofmat-2))
 							n++;
 						else
 						{
@@ -495,39 +495,39 @@ complex** cofactor(complex **num,int f)
 				}
 			}
 			if ((q+p)%2==0)
-			fac[q][p]=guassian_determinant(b,f-1);
+			gauss_factors[q][p]=gaussian_determinant(b,sizeofmat-1);
 		    else
-		    fac[q][p]=-1*guassian_determinant(b,f-1);
+		    gauss_factors[q][p]=-1*gaussian_determinant(b,sizeofmat-1);
 		    
 		    }
 	}
-	inv=find_inverse(num,fac,f );
-	return inv;
+	inverse=find_inverse(con_mat,gauss_factors,sizeofmat );
+	return inverse;
 }
 
-complex* solution(complex** inv,complex* cur_mat,int sizeofmat)			
+complex* solution(complex** inverse,complex* cur_mat,int sizeofmat)			
 {
 	int i,j,k;
-	complex* ans;
-	ans=malloc((sizeofmat)*sizeof(complex));
+	complex* ans_mat;
+	ans_mat=malloc((sizeofmat)*sizeof(complex));
 	
 	for(i=0;i<sizeofmat;i++)
-		ans[i]=0;
+		ans_mat[i]=0;
 	
 	for(i=0;i<sizeofmat;i++)
 	{
 		for(j=0;j<sizeofmat;j++)
-			ans[i]+=inv[i][j]*cur_mat[j];
+			ans_mat[i]+=inverse[i][j]*cur_mat[j];
 	}		
 		
-	return ans;
+	return ans_mat;
 }	
 	
 
 
 /*******************************************************************************
  *                                                                             
- * This is the main function of the program. It does the following:
+ * This is one of the main functions of the program. It does the following:
  * 
  * It initializes three matrices based on input size. 
  * con_mat = Conductance Matrix
@@ -545,7 +545,7 @@ complex* solution(complex** inv,complex* cur_mat,int sizeofmat)
 void generate_matrix(int sizeofmat,int node_max,Node* node1,int w)
 {
   int i,j,k;
-  complex **con_mat,*cur_mat,**imp_mat,**inv,*ans;
+  complex **con_mat,*cur_mat,**imp_mat,**inverse,*ans_mat;
   complex det,z;		
   con_mat=malloc(sizeofmat*sizeof(complex));	
   for(i=0;i<sizeofmat;i++)
@@ -677,11 +677,10 @@ void generate_matrix(int sizeofmat,int node_max,Node* node1,int w)
     }		
   printf("\n\n");
   
-  inv=cofactor(con_mat,sizeofmat);												//finding the inverse
+  inverse=cofactor(con_mat,sizeofmat);												
 	
-	printf("\n");
-	ans=solution(inv,cur_mat,sizeofmat);
-	
+	ans_mat=solution(inverse,cur_mat,sizeofmat);
+	printf("The solutions to the above circuit are: \n");
 	if(sizeofmat!=1)
 	{
 		for(i=0;i<sizeofmat;i++)
@@ -691,7 +690,7 @@ void generate_matrix(int sizeofmat,int node_max,Node* node1,int w)
 			else
 				printf("I%d\t=\t",i-node_max+2);		
 		
-			printf("%f+%fi\n",creal(ans[i]),cimag(ans[i]));
+			printf("%f+%fi\n",creal(ans_mat[i]),cimag(ans_mat[i]));
 		}
 	}
 	
@@ -700,12 +699,13 @@ void generate_matrix(int sizeofmat,int node_max,Node* node1,int w)
 		z=cur_mat[0]/con_mat[0][0];
 		printf("V1\t=\t%f+%fi\n",creal(z),cimag(z));
 	}	
-	
+
+  printf("\n");
   free(imp_mat);			
   free(con_mat);
   free(cur_mat);
-  free(ans);
-  free(inv);
+  free(ans_mat);
+  free(inverse);
 }
 		
 int find_hash(char* name)
