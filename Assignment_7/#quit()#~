@@ -1,0 +1,13 @@
+Python 2.7.2+ (default, Oct  4 2011, 20:03:08) 
+[GCC 4.6.1] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> python assignment7_7.py output.dat
+  File "<stdin>", line 1
+    python assignment7_7.py output.dat
+                       ^
+SyntaxError: invalid syntax
+>>> quit
+Use quit() or Ctrl-D (i.e. EOF) to exit
+>>> quit(
+... )
+dns

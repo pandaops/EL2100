@@ -1,0 +1,1104 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass literate-article
+\use_default_options true
+\maintain_unincluded_children false
+\language canadian
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 1
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Python Assignment -1
+\end_layout
+
+\begin_layout Author
+Swapnil Basak
+\end_layout
+
+\begin_layout Date
+EE11B122, IIT Madras
+\end_layout
+
+\begin_layout Abstract
+A series of 6 small programs to demonstrate scientific python programming
+ and plotting in python using scipy and matplotlib.
+\end_layout
+
+\begin_layout Section
+Assignment 1.a
+\end_layout
+
+\begin_layout Subsection
+Problem
+\end_layout
+
+\begin_layout Standard
+Write a Python program to tabulate the fourier series, 
+\begin_inset Formula $y(x)=sin(x)+\nicefrac{sin(3x)}{3}+\nicefrac{sin(5x)}{5}+\nicefrac{sin(7x)}{7}$
+\end_inset
+
+ over 201 uniformly spaced points from −
+\begin_inset Formula $π$
+\end_inset
+
+ to 
+\begin_inset Formula $π$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Code
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+import scipy
+\end_layout
+
+\begin_layout Scrap
+
+import matplotlib.pyplot as graph
+\end_layout
+
+\begin_layout Scrap
+
+import math
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+samples=scipy.linspace(-math.pi,math.pi,num=201)
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Our function
+\end_layout
+
+\begin_layout Scrap
+
+def fourier_series(x):
+\end_layout
+
+\begin_layout Scrap
+
+    return math.sin(x) + math.sin(3*x)/3 + math.sin(5*x)/5 + math.sin(7*x)/7
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Vector Map operation
+\end_layout
+
+\begin_layout Scrap
+
+results = map(fourier_series,samples)
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Displaying the results
+\end_layout
+
+\begin_layout Scrap
+
+for xx in scipy.c_[samples,results]:
+\end_layout
+
+\begin_layout Scrap
+
+    print "%.4f: %.4f" % (xx[0],xx[1])
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the Graph
+\end_layout
+
+\begin_layout Scrap
+
+graph.plot(samples,results,'ro')
+\end_layout
+
+\begin_layout Scrap
+
+graph.show()
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection
+Graph
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename plot_1.png
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Graph Plot
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Assignment 1.a
+\end_layout
+
+\begin_layout Subsection
+Problem
+\end_layout
+
+\begin_layout Standard
+Write a python program to compute 
+\begin_inset Formula $f(x)=\sum_{n=1}^{\infty}\cfrac{(-1)^{^{n}}x}{x^{2}+n^{2}}$
+\end_inset
+
+ correct to 0.0001, for the range 
+\begin_inset Formula $1<x<100$
+\end_inset
+
+ in steps of 0.1.
+\end_layout
+
+\begin_layout Subsection
+Code
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+import scipy
+\end_layout
+
+\begin_layout Scrap
+
+import matplotlib.pyplot as graph
+\end_layout
+
+\begin_layout Scrap
+
+import math
+\end_layout
+
+\begin_layout Scrap
+
+import scipy.special as step
+\end_layout
+
+\begin_layout Scrap
+
+# Parameters
+\end_layout
+
+\begin_layout Scrap
+
+MAX_ITER=1000
+\end_layout
+
+\begin_layout Scrap
+
+MIN_ERR=1e-4
+\end_layout
+
+\begin_layout Scrap
+
+samples = step.arange(1,100,0.1)
+\end_layout
+
+\begin_layout Scrap
+
+results = scipy.linspace(0,0,len(samples))
+\end_layout
+
+\begin_layout Scrap
+
+# Calculate series till least error is achieved
+\end_layout
+
+\begin_layout Scrap
+
+for x in samples:
+\end_layout
+
+\begin_layout Scrap
+
+    index=scipy.nonzero(samples==x)[0][0]
+\end_layout
+
+\begin_layout Scrap
+
+    sign=1   
+\end_layout
+
+\begin_layout Scrap
+
+    for n in range(1,MAX_ITER):
+\end_layout
+
+\begin_layout Scrap
+
+       t = sign*x/(x*x+n*n)
+\end_layout
+
+\begin_layout Scrap
+
+       results[index] += t
+\end_layout
+
+\begin_layout Scrap
+
+       sign = -sign
+\end_layout
+
+\begin_layout Scrap
+
+       if(abs(t)<MIN_ERR):
+\end_layout
+
+\begin_layout Scrap
+
+           break
+\end_layout
+
+\begin_layout Scrap
+
+# Write to file
+\end_layout
+
+\begin_layout Scrap
+
+with file('output.dat','w') as output:            
+\end_layout
+
+\begin_layout Scrap
+
+    for xx in scipy.c_[samples,results]:
+\end_layout
+
+\begin_layout Scrap
+
+        output.write(str(xx[0])+'
+\backslash
+t'+str(xx[1])+'
+\backslash
+n')
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Section
+Assignment 1.c
+\end_layout
+
+\begin_layout Subsection
+Problem
+\end_layout
+
+\begin_layout Standard
+Write a Python program to tabulate the values of, 
+\begin_inset Formula $y(x)=sin(x^{2})$
+\end_inset
+
+ over 101 uniformly spaced points from 0 to 
+\begin_inset Formula $5$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Code
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+import scipy
+\end_layout
+
+\begin_layout Scrap
+
+import matplotlib.pyplot as graph
+\end_layout
+
+\begin_layout Scrap
+
+import math
+\end_layout
+
+\begin_layout Scrap
+
+import scipy.special as sp
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+samples=scipy.linspace(0,5,num=101)
+\end_layout
+
+\begin_layout Scrap
+
+results=scipy.linspace(0,0,num=101)
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Vector assignment
+\end_layout
+
+\begin_layout Scrap
+
+results = sp.sin(samples*samples)
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the graph
+\end_layout
+
+\begin_layout Scrap
+
+graph.plot(samples,results,'ro',samples,results,'k')
+\end_layout
+
+\begin_layout Scrap
+
+graph.show()
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+@
+\end_layout
+
+\begin_layout Subsection
+Graph
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename plot_3.png
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Graph Plot
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Assignment 1.d
+\end_layout
+
+\begin_layout Subsection
+Problem
+\end_layout
+
+\begin_layout Standard
+Write a Python program to compute and plot 
+\begin_inset Formula $y(x)=\sum_{k=1,odd}^{11}c_{k}sin(kx)$
+\end_inset
+
+ where 
+\begin_inset Formula $c_{m}=\nicefrac{1}{m}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Code
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+import scipy
+\end_layout
+
+\begin_layout Scrap
+
+import matplotlib.pyplot as graph
+\end_layout
+
+\begin_layout Scrap
+
+import math
+\end_layout
+
+\begin_layout Scrap
+
+import scipy.special as sp
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+samples=scipy.linspace(-3,+3,101)
+\end_layout
+
+\begin_layout Scrap
+
+results=scipy.linspace(0,0,101)
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Vector operation for each k
+\end_layout
+
+\begin_layout Scrap
+
+for k in range(1,11,2):
+\end_layout
+
+\begin_layout Scrap
+
+    results += sp.sin(k*samples)/k
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Graph plotting
+\end_layout
+
+\begin_layout Scrap
+
+graph.plot(samples,results,'ro',samples,results,'k')
+\end_layout
+
+\begin_layout Scrap
+
+graph.show()
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection
+Graph
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename plot_4.png
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Graph Plot
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Assignment 1.e
+\end_layout
+
+\begin_layout Subsection
+Problem
+\end_layout
+
+\begin_layout Standard
+Obtain the histogram of word lengths of one of your previous lyx ﬁles.
+ This requires you to read in the ﬁle, break it into words, get the length
+ of the words, and p lot a histogram of the lengths
+\end_layout
+
+\begin_layout Subsection
+Code
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+import matplotlib.pyplot as graph
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+FILENAME='wordcount.lyx'
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# Form list of worcount
+\end_layout
+
+\begin_layout Scrap
+
+with file(FILENAME,'rb') as txt:
+\end_layout
+
+\begin_layout Scrap
+
+    lines=txt.readlines()
+\end_layout
+
+\begin_layout Scrap
+
+    count=[]
+\end_layout
+
+\begin_layout Scrap
+
+    for line in lines:
+\end_layout
+
+\begin_layout Scrap
+
+        count.extend([len(x) for x in line.split()])
+\end_layout
+
+\begin_layout Scrap
+
+    
+\end_layout
+
+\begin_layout Scrap
+
+# Plot graph    
+\end_layout
+
+\begin_layout Scrap
+
+graph.hist(count,range(20))
+\end_layout
+
+\begin_layout Scrap
+
+graph.show()
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection
+Graph
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename plot_5.png
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Graph Plot
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Assignment 1.e
+\end_layout
+
+\begin_layout Subsection
+Problem
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+Create
+\series default
+ a script “myplot.py” that loads this ﬁle and plots the second column versus
+ the ﬁrst column.The sc ript should take in as argument the following: (a)
+ The name of the data ﬁle.
+ (b) An optional second argument whose value (0,1,2) indicates if we wish
+ for a linear plot, a semi log plot or a log log plot, respectively.
+\end_layout
+
+\begin_layout Subsection
+Code
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+#! /usr/bin/env python
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+# The above shebang allows for *nix systems to
+\end_layout
+
+\begin_layout Scrap
+
+# automatically open the file.
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+import sys
+\end_layout
+
+\begin_layout Scrap
+
+import scipy
+\end_layout
+
+\begin_layout Scrap
+
+import matplotlib.pyplot as graph
+\end_layout
+
+\begin_layout Scrap
+
+import scipy.special as sp
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+if len(sys.argv)<2:
+\end_layout
+
+\begin_layout Scrap
+
+    print "No filename passed.
+ Please pass a filename"
+\end_layout
+
+\begin_layout Scrap
+
+    exit
+\end_layout
+
+\begin_layout Scrap
+
+elif len(sys.argv)>4:
+\end_layout
+
+\begin_layout Scrap
+
+    print "Too many arguements.
+ Ignoring..."
+\end_layout
+
+\begin_layout Scrap
+
+elif len(sys.argv)==2:
+\end_layout
+
+\begin_layout Scrap
+
+    print "No choice passed.
+ Taking 0 as default"
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+samples,results =scipy.loadtxt(sys.argv[1],usecols=(0,1),unpack=True)
+\end_layout
+
+\begin_layout Scrap
+
+try:
+\end_layout
+
+\begin_layout Scrap
+
+    choice = sys.argv[2]
+\end_layout
+
+\begin_layout Scrap
+
+except:
+\end_layout
+
+\begin_layout Scrap
+
+    choice = '0'
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+if (choice=='0'):
+\end_layout
+
+\begin_layout Scrap
+
+    graph.plot(samples,results)
+\end_layout
+
+\begin_layout Scrap
+
+elif (choice=='1'):
+\end_layout
+
+\begin_layout Scrap
+
+    graph.semilogy(samples,results)
+\end_layout
+
+\begin_layout Scrap
+
+elif (choice=='2'):
+\end_layout
+
+\begin_layout Scrap
+
+    graph.loglog(samples,results)
+\end_layout
+
+\begin_layout Scrap
+
+else:
+\end_layout
+
+\begin_layout Scrap
+
+    print "Invalid Choice"
+\end_layout
+
+\begin_layout Scrap
+
+    exit
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+graph.show()
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection
+Graph
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename plot_5.png
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Graph Plot
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\end_body
+\end_document
