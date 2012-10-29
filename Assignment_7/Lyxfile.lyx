@@ -19,7 +19,7 @@
 \font_sf_scale 100
 \font_tt_scale 100
 
-\graphics default
+\graphics pdftex
 \default_output_format default
 \output_sync 1
 \bibtex_command default
@@ -90,12 +90,12 @@ Write a Python program to tabulate the fourier series,
 \begin_inset Formula $y(x)=sin(x)+\nicefrac{sin(3x)}{3}+\nicefrac{sin(5x)}{5}+\nicefrac{sin(7x)}{7}$
 \end_inset
 
- over 201 uniformly spaced points from −
-\begin_inset Formula $π$
+ over 201 uniformly spaced points from 
+\begin_inset Formula $-\pi$
 \end_inset
 
  to 
-\begin_inset Formula $π$
+\begin_inset Formula $\pi$
 \end_inset
 
 .
@@ -106,8 +106,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
-<<code>>
+<<code>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -115,97 +114,62 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
 import scipy
 \end_layout
 
 \begin_layout Scrap
-
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
-
 import math
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 samples=scipy.linspace(-math.pi,math.pi,num=201)
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 # Our function
 \end_layout
 
 \begin_layout Scrap
-
 def fourier_series(x):
 \end_layout
 
 \begin_layout Scrap
-
     return math.sin(x) + math.sin(3*x)/3 + math.sin(5*x)/5 + math.sin(7*x)/7
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 # Vector Map operation
 \end_layout
 
 \begin_layout Scrap
-
 results = map(fourier_series,samples)
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 # Displaying the results
 \end_layout
 
 \begin_layout Scrap
-
 for xx in scipy.c_[samples,results]:
 \end_layout
 
 \begin_layout Scrap
-
     print "%.4f: %.4f" % (xx[0],xx[1])
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 # Plotting the Graph
 \end_layout
 
 \begin_layout Scrap
-
 graph.plot(samples,results,'ro')
 \end_layout
 
 \begin_layout Scrap
-
 graph.show()
 \begin_inset Newline newline
 \end_inset
@@ -226,6 +190,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename plot_1.png
+	scale 60
 	rotateOrigin center
 
 \end_inset
@@ -242,10 +207,6 @@ Graph Plot
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -279,8 +240,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
-<<code>>
+<<code>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -288,117 +248,94 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
 import scipy
 \end_layout
 
 \begin_layout Scrap
-
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
-
 import math
 \end_layout
 
 \begin_layout Scrap
-
 import scipy.special as step
 \end_layout
 
 \begin_layout Scrap
-
 # Parameters
 \end_layout
 
 \begin_layout Scrap
-
 MAX_ITER=1000
 \end_layout
 
 \begin_layout Scrap
-
 MIN_ERR=1e-4
 \end_layout
 
 \begin_layout Scrap
-
 samples = step.arange(1,100,0.1)
 \end_layout
 
 \begin_layout Scrap
-
 results = scipy.linspace(0,0,len(samples))
 \end_layout
 
 \begin_layout Scrap
-
 # Calculate series till least error is achieved
 \end_layout
 
 \begin_layout Scrap
-
 for x in samples:
 \end_layout
 
 \begin_layout Scrap
-
     index=scipy.nonzero(samples==x)[0][0]
 \end_layout
 
 \begin_layout Scrap
-
     sign=1   
 \end_layout
 
 \begin_layout Scrap
-
     for n in range(1,MAX_ITER):
 \end_layout
 
 \begin_layout Scrap
-
        t = sign*x/(x*x+n*n)
 \end_layout
 
 \begin_layout Scrap
-
        results[index] += t
 \end_layout
 
 \begin_layout Scrap
-
        sign = -sign
 \end_layout
 
 \begin_layout Scrap
-
        if(abs(t)<MIN_ERR):
 \end_layout
 
 \begin_layout Scrap
-
            break
 \end_layout
 
 \begin_layout Scrap
-
 # Write to file
 \end_layout
 
 \begin_layout Scrap
-
 with file('output.dat','w') as output:            
 \end_layout
 
 \begin_layout Scrap
-
     for xx in scipy.c_[samples,results]:
 \end_layout
 
 \begin_layout Scrap
-
         output.write(str(xx[0])+'
 \backslash
 t'+str(xx[1])+'
@@ -407,7 +344,6 @@ n')
 \end_layout
 
 \begin_layout Scrap
-
 \begin_inset Newline newline
 \end_inset
 
@@ -439,79 +375,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
-<<code>>
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-
-import scipy
-\end_layout
-
-\begin_layout Scrap
-
-import matplotlib.pyplot as graph
-\end_layout
-
-\begin_layout Scrap
-
-import math
-\end_layout
-
-\begin_layout Scrap
-
-import scipy.special as sp
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Scrap
-
-samples=scipy.linspace(0,5,num=101)
-\end_layout
-
-\begin_layout Scrap
-
-results=scipy.linspace(0,0,num=101)
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Scrap
-
-# Vector assignment
-\end_layout
-
-\begin_layout Scrap
-
-results = sp.sin(samples*samples)
-\end_layout
-
-\begin_layout Standard
-
-\end_layout
-
-\begin_layout Scrap
-
-# Plotting the graph
-\end_layout
-
-\begin_layout Scrap
-
-graph.plot(samples,results,'ro',samples,results,'k')
-\end_layout
-
-\begin_layout Scrap
-
-graph.show()
+<<code>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -519,6 +383,49 @@ graph.show()
 \end_layout
 
 \begin_layout Scrap
+import scipy
+\end_layout
+
+\begin_layout Scrap
+import matplotlib.pyplot as graph
+\end_layout
+
+\begin_layout Scrap
+import math
+\end_layout
+
+\begin_layout Scrap
+import scipy.special as sp
+\end_layout
+
+\begin_layout Scrap
+samples=scipy.linspace(0,5,num=101)
+\end_layout
+
+\begin_layout Scrap
+results=scipy.linspace(0,0,num=101)
+\end_layout
+
+\begin_layout Scrap
+# Vector assignment
+\end_layout
+
+\begin_layout Scrap
+results = sp.sin(samples*samples)
+\end_layout
+
+\begin_layout Scrap
+# Plotting the graph
+\end_layout
+
+\begin_layout Scrap
+graph.plot(samples,results,'ro',samples,results,'k')
+\end_layout
+
+\begin_layout Scrap
+graph.show()
+\begin_inset Newline newline
+\end_inset
 
 @
 \end_layout
@@ -536,6 +443,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename plot_3.png
+	scale 60
 	rotateOrigin center
 
 \end_inset
@@ -585,8 +493,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
-<<code>>
+<<code>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -594,79 +501,54 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
 import scipy
 \end_layout
 
 \begin_layout Scrap
-
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
-
 import math
 \end_layout
 
 \begin_layout Scrap
-
 import scipy.special as sp
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 samples=scipy.linspace(-3,+3,101)
 \end_layout
 
 \begin_layout Scrap
-
 results=scipy.linspace(0,0,101)
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 # Vector operation for each k
 \end_layout
 
 \begin_layout Scrap
-
 for k in range(1,11,2):
 \end_layout
 
 \begin_layout Scrap
-
     results += sp.sin(k*samples)/k
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 # Graph plotting
 \end_layout
 
 \begin_layout Scrap
-
 graph.plot(samples,results,'ro',samples,results,'k')
 \end_layout
 
 \begin_layout Scrap
-
 graph.show()
 \end_layout
 
 \begin_layout Scrap
-
 \begin_inset Newline newline
 \end_inset
 
@@ -686,6 +568,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename plot_4.png
+	scale 60
 	rotateOrigin center
 
 \end_inset
@@ -729,8 +612,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
-<<code>>
+<<code>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -738,70 +620,50 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
 import matplotlib.pyplot as graph
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 FILENAME='wordcount.lyx'
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 # Form list of worcount
 \end_layout
 
 \begin_layout Scrap
-
 with file(FILENAME,'rb') as txt:
 \end_layout
 
 \begin_layout Scrap
-
     lines=txt.readlines()
 \end_layout
 
 \begin_layout Scrap
-
     count=[]
 \end_layout
 
 \begin_layout Scrap
-
     for line in lines:
 \end_layout
 
 \begin_layout Scrap
-
         count.extend([len(x) for x in line.split()])
 \end_layout
 
 \begin_layout Scrap
-
     
 \end_layout
 
 \begin_layout Scrap
-
 # Plot graph    
 \end_layout
 
 \begin_layout Scrap
-
 graph.hist(count,range(20))
 \end_layout
 
 \begin_layout Scrap
-
 graph.show()
 \begin_inset Newline newline
 \end_inset
@@ -822,6 +684,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename plot_5.png
+	scale 60
 	rotateOrigin center
 
 \end_inset
@@ -871,8 +734,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
-<<code>>
+<<code>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -880,179 +742,129 @@ Code
 \end_layout
 
 \begin_layout Scrap
-
 #! /usr/bin/env python
-\end_layout
-
-\begin_layout Standard
-
 \end_layout
 
 \begin_layout Scrap
 
+\end_layout
+
+\begin_layout Scrap
 # The above shebang allows for *nix systems to
 \end_layout
 
 \begin_layout Scrap
-
 # automatically open the file.
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 import sys
 \end_layout
 
 \begin_layout Scrap
-
 import scipy
 \end_layout
 
 \begin_layout Scrap
-
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
-
 import scipy.special as sp
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 if len(sys.argv)<2:
 \end_layout
 
 \begin_layout Scrap
-
     print "No filename passed.
  Please pass a filename"
 \end_layout
 
 \begin_layout Scrap
-
     exit
 \end_layout
 
 \begin_layout Scrap
-
 elif len(sys.argv)>4:
 \end_layout
 
 \begin_layout Scrap
-
     print "Too many arguements.
  Ignoring..."
 \end_layout
 
 \begin_layout Scrap
-
 elif len(sys.argv)==2:
 \end_layout
 
 \begin_layout Scrap
-
     print "No choice passed.
  Taking 0 as default"
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 samples,results =scipy.loadtxt(sys.argv[1],usecols=(0,1),unpack=True)
 \end_layout
 
 \begin_layout Scrap
-
 try:
 \end_layout
 
 \begin_layout Scrap
-
     choice = sys.argv[2]
 \end_layout
 
 \begin_layout Scrap
-
 except:
 \end_layout
 
 \begin_layout Scrap
-
     choice = '0'
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 if (choice=='0'):
 \end_layout
 
 \begin_layout Scrap
-
     graph.plot(samples,results)
 \end_layout
 
 \begin_layout Scrap
-
 elif (choice=='1'):
 \end_layout
 
 \begin_layout Scrap
-
     graph.semilogy(samples,results)
 \end_layout
 
 \begin_layout Scrap
-
 elif (choice=='2'):
 \end_layout
 
 \begin_layout Scrap
-
     graph.loglog(samples,results)
 \end_layout
 
 \begin_layout Scrap
-
 else:
 \end_layout
 
 \begin_layout Scrap
-
     print "Invalid Choice"
 \end_layout
 
 \begin_layout Scrap
-
     exit
 \end_layout
 
-\begin_layout Standard
-
-\end_layout
-
 \begin_layout Scrap
-
 graph.show()
 \end_layout
 
 \begin_layout Scrap
-
 \begin_inset Newline newline
 \end_inset
 
@@ -1072,6 +884,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename plot_6_0.png
+	scale 60
 	rotateOrigin center
 
 \end_inset
@@ -1082,6 +895,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename plot_6_1.png
+	scale 60
 
 \end_inset
 
@@ -1091,6 +905,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename plot_6_2.png
+	scale 60
 
 \end_inset
 
