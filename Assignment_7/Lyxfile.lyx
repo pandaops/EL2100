@@ -61,7 +61,7 @@
 \begin_body
 
 \begin_layout Title
-Python Assignment -1
+Python Assignment -4
 \end_layout
 
 \begin_layout Author
@@ -73,39 +73,41 @@ EE11B122, IIT Madras
 \end_layout
 
 \begin_layout Abstract
-A series of 6 small programs to demonstrate scientific python programming
- and plotting in python using scipy and matplotlib.
+We use a 1-Dimensional model of the tubelight.
+ A uniform electric ﬁeld is present, that accelerates electrons.
+ Electrons are emitted by the cathode with zero energy, and accelerate in
+ this ﬁeld.
+ When they get beyond a threshold energy 
+\begin_inset Formula $E_{0}$
+\end_inset
+
+, they can drive atoms to excited states.
+ The relaxation of these atoms results in light emission.
+ In our model, we will assume that the relaxation is immediate.
+ The electron loses all its energy and the process starts again.
+ Electrons reaching the anode are absorbed and lost.
+ Each “time step”, an average of 
+\begin_inset Formula $N$
+\end_inset
+
+ electrons are introduced at the cathode.
+ We will conclude with population plots and the intensity data table.
 \end_layout
 
-\begin_layout Section
-Assignment 1.a
-\end_layout
-
-\begin_layout Subsection
-Problem
+\begin_layout Section*
+Program
 \end_layout
 
 \begin_layout Standard
-Write a Python program to tabulate the fourier series, 
-\begin_inset Formula $y(x)=sin(x)+\nicefrac{sin(3x)}{3}+\nicefrac{sin(5x)}{5}+\nicefrac{sin(7x)}{7}$
-\end_inset
-
- over 201 uniformly spaced points from 
-\begin_inset Formula $-\pi$
-\end_inset
-
- to 
-\begin_inset Formula $\pi$
-\end_inset
-
-.
+We include the shebang and import out libraries
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsection*
 Code
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -114,133 +116,50 @@ Code
 \end_layout
 
 \begin_layout Scrap
-import scipy
+
+#! usr/bin/python
 \end_layout
 
 \begin_layout Scrap
-import matplotlib.pyplot as graph
+
 \end_layout
 
 \begin_layout Scrap
-import math
+
+import sys
 \end_layout
 
 \begin_layout Scrap
-samples=scipy.linspace(-math.pi,math.pi,num=201)
+
+from scipy import *
 \end_layout
 
 \begin_layout Scrap
-# Our function
+
+from matplotlib.pyplot import *
 \end_layout
 
 \begin_layout Scrap
-def fourier_series(x):
+
+from matplotlib.mlab import *
 \end_layout
 
 \begin_layout Scrap
-    return math.sin(x) + math.sin(3*x)/3 + math.sin(5*x)/5 + math.sin(7*x)/7
-\end_layout
 
-\begin_layout Scrap
-# Vector Map operation
-\end_layout
-
-\begin_layout Scrap
-results = map(fourier_series,samples)
-\end_layout
-
-\begin_layout Scrap
-# Displaying the results
-\end_layout
-
-\begin_layout Scrap
-for xx in scipy.c_[samples,results]:
-\end_layout
-
-\begin_layout Scrap
-    print "%.4f: %.4f" % (xx[0],xx[1])
-\end_layout
-
-\begin_layout Scrap
-# Plotting the Graph
-\end_layout
-
-\begin_layout Scrap
-graph.plot(samples,results,'ro')
-\end_layout
-
-\begin_layout Scrap
-graph.show()
 \begin_inset Newline newline
 \end_inset
 
 @
 \end_layout
 
-\begin_layout Subsection
-Graph
-\end_layout
-
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename plot_1.png
-	scale 60
-	rotateOrigin center
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Graph Plot
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Assignment 1.a
-\end_layout
-
-\begin_layout Subsection
-Problem
-\end_layout
-
-\begin_layout Standard
-Write a python program to compute 
-\begin_inset Formula $f(x)=\sum_{n=1}^{\infty}\cfrac{(-1)^{^{n}}x}{x^{2}+n^{2}}$
-\end_inset
-
- correct to 0.0001, for the range 
-\begin_inset Formula $1<x<100$
-\end_inset
-
- in steps of 0.1.
-\end_layout
-
-\begin_layout Subsection
-Code
+Now, we facilitate taking arguements from the command line and account for
+ erraneous input
 \end_layout
 
 \begin_layout Scrap
-<<code>>=
+
+<<loop>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -248,94 +167,117 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 import scipy
 \end_layout
 
 \begin_layout Scrap
+
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
+
 import math
 \end_layout
 
 \begin_layout Scrap
+
 import scipy.special as step
 \end_layout
 
 \begin_layout Scrap
+
 # Parameters
 \end_layout
 
 \begin_layout Scrap
+
 MAX_ITER=1000
 \end_layout
 
 \begin_layout Scrap
+
 MIN_ERR=1e-4
 \end_layout
 
 \begin_layout Scrap
+
 samples = step.arange(1,100,0.1)
 \end_layout
 
 \begin_layout Scrap
+
 results = scipy.linspace(0,0,len(samples))
 \end_layout
 
 \begin_layout Scrap
+
 # Calculate series till least error is achieved
 \end_layout
 
 \begin_layout Scrap
+
 for x in samples:
 \end_layout
 
 \begin_layout Scrap
+
     index=scipy.nonzero(samples==x)[0][0]
 \end_layout
 
 \begin_layout Scrap
+
     sign=1   
 \end_layout
 
 \begin_layout Scrap
+
     for n in range(1,MAX_ITER):
 \end_layout
 
 \begin_layout Scrap
+
        t = sign*x/(x*x+n*n)
 \end_layout
 
 \begin_layout Scrap
+
        results[index] += t
 \end_layout
 
 \begin_layout Scrap
+
        sign = -sign
 \end_layout
 
 \begin_layout Scrap
+
        if(abs(t)<MIN_ERR):
 \end_layout
 
 \begin_layout Scrap
+
            break
 \end_layout
 
 \begin_layout Scrap
+
 # Write to file
 \end_layout
 
 \begin_layout Scrap
+
 with file('output.dat','w') as output:            
 \end_layout
 
 \begin_layout Scrap
+
     for xx in scipy.c_[samples,results]:
 \end_layout
 
 \begin_layout Scrap
+
         output.write(str(xx[0])+'
 \backslash
 t'+str(xx[1])+'
@@ -344,6 +286,7 @@ n')
 \end_layout
 
 \begin_layout Scrap
+
 \begin_inset Newline newline
 \end_inset
 
@@ -375,6 +318,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -383,46 +327,57 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 import scipy
 \end_layout
 
 \begin_layout Scrap
+
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
+
 import math
 \end_layout
 
 \begin_layout Scrap
+
 import scipy.special as sp
 \end_layout
 
 \begin_layout Scrap
+
 samples=scipy.linspace(0,5,num=101)
 \end_layout
 
 \begin_layout Scrap
+
 results=scipy.linspace(0,0,num=101)
 \end_layout
 
 \begin_layout Scrap
+
 # Vector assignment
 \end_layout
 
 \begin_layout Scrap
+
 results = sp.sin(samples*samples)
 \end_layout
 
 \begin_layout Scrap
+
 # Plotting the graph
 \end_layout
 
 \begin_layout Scrap
+
 graph.plot(samples,results,'ro',samples,results,'k')
 \end_layout
 
 \begin_layout Scrap
+
 graph.show()
 \begin_inset Newline newline
 \end_inset
@@ -493,6 +448,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -501,54 +457,67 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 import scipy
 \end_layout
 
 \begin_layout Scrap
+
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
+
 import math
 \end_layout
 
 \begin_layout Scrap
+
 import scipy.special as sp
 \end_layout
 
 \begin_layout Scrap
+
 samples=scipy.linspace(-3,+3,101)
 \end_layout
 
 \begin_layout Scrap
+
 results=scipy.linspace(0,0,101)
 \end_layout
 
 \begin_layout Scrap
+
 # Vector operation for each k
 \end_layout
 
 \begin_layout Scrap
+
 for k in range(1,11,2):
 \end_layout
 
 \begin_layout Scrap
+
     results += sp.sin(k*samples)/k
 \end_layout
 
 \begin_layout Scrap
+
 # Graph plotting
 \end_layout
 
 \begin_layout Scrap
+
 graph.plot(samples,results,'ro',samples,results,'k')
 \end_layout
 
 \begin_layout Scrap
+
 graph.show()
 \end_layout
 
 \begin_layout Scrap
+
 \begin_inset Newline newline
 \end_inset
 
@@ -612,6 +581,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -620,50 +590,62 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
+
 FILENAME='wordcount.lyx'
 \end_layout
 
 \begin_layout Scrap
+
 # Form list of worcount
 \end_layout
 
 \begin_layout Scrap
+
 with file(FILENAME,'rb') as txt:
 \end_layout
 
 \begin_layout Scrap
+
     lines=txt.readlines()
 \end_layout
 
 \begin_layout Scrap
+
     count=[]
 \end_layout
 
 \begin_layout Scrap
+
     for line in lines:
 \end_layout
 
 \begin_layout Scrap
+
         count.extend([len(x) for x in line.split()])
 \end_layout
 
 \begin_layout Scrap
+
     
 \end_layout
 
 \begin_layout Scrap
+
 # Plot graph    
 \end_layout
 
 \begin_layout Scrap
+
 graph.hist(count,range(20))
 \end_layout
 
 \begin_layout Scrap
+
 graph.show()
 \begin_inset Newline newline
 \end_inset
@@ -734,6 +716,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -742,6 +725,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 #! /usr/bin/env python
 \end_layout
 
@@ -750,121 +734,150 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 # The above shebang allows for *nix systems to
 \end_layout
 
 \begin_layout Scrap
+
 # automatically open the file.
 \end_layout
 
 \begin_layout Scrap
+
 import sys
 \end_layout
 
 \begin_layout Scrap
+
 import scipy
 \end_layout
 
 \begin_layout Scrap
+
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
+
 import scipy.special as sp
 \end_layout
 
 \begin_layout Scrap
+
 if len(sys.argv)<2:
 \end_layout
 
 \begin_layout Scrap
+
     print "No filename passed.
  Please pass a filename"
 \end_layout
 
 \begin_layout Scrap
+
     exit
 \end_layout
 
 \begin_layout Scrap
+
 elif len(sys.argv)>4:
 \end_layout
 
 \begin_layout Scrap
+
     print "Too many arguements.
  Ignoring..."
 \end_layout
 
 \begin_layout Scrap
+
 elif len(sys.argv)==2:
 \end_layout
 
 \begin_layout Scrap
+
     print "No choice passed.
  Taking 0 as default"
 \end_layout
 
 \begin_layout Scrap
+
 samples,results =scipy.loadtxt(sys.argv[1],usecols=(0,1),unpack=True)
 \end_layout
 
 \begin_layout Scrap
+
 try:
 \end_layout
 
 \begin_layout Scrap
+
     choice = sys.argv[2]
 \end_layout
 
 \begin_layout Scrap
+
 except:
 \end_layout
 
 \begin_layout Scrap
+
     choice = '0'
 \end_layout
 
 \begin_layout Scrap
+
 if (choice=='0'):
 \end_layout
 
 \begin_layout Scrap
+
     graph.plot(samples,results)
 \end_layout
 
 \begin_layout Scrap
+
 elif (choice=='1'):
 \end_layout
 
 \begin_layout Scrap
+
     graph.semilogy(samples,results)
 \end_layout
 
 \begin_layout Scrap
+
 elif (choice=='2'):
 \end_layout
 
 \begin_layout Scrap
+
     graph.loglog(samples,results)
 \end_layout
 
 \begin_layout Scrap
+
 else:
 \end_layout
 
 \begin_layout Scrap
+
     print "Invalid Choice"
 \end_layout
 
 \begin_layout Scrap
+
     exit
 \end_layout
 
 \begin_layout Scrap
+
 graph.show()
 \end_layout
 
 \begin_layout Scrap
+
 \begin_inset Newline newline
 \end_inset
 

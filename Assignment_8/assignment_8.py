@@ -27,6 +27,7 @@ def series(new_samples,new_results):
     for i in range(len(new_samples)):	
         new_results[i]=step*(cumsum(func(new_samples))[i] + 0.5*(func(new_samples[0])+func(new_samples[i])))
     return new_results
+    
 
 def ftrap(oldx,oldy):
     newx = sp.arange(oldx[0],oldx[-1]+(0.5)*step,0.5*step)
