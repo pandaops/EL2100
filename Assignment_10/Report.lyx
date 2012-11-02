@@ -1,0 +1,812 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass literate-article
+\use_default_options true
+\maintain_unincluded_children false
+\language canadian
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics pdftex
+\default_output_format default
+\output_sync 1
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.5cm
+\topmargin 1.5cm
+\rightmargin 1.5cm
+\bottommargin 0.5cm
+\headheight 0.5cm
+\headsep 0.5cm
+\footskip 0.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Python Assignment -4
+\end_layout
+
+\begin_layout Author
+Swapnil Basak
+\end_layout
+
+\begin_layout Date
+EE11B122, IIT Madras
+\end_layout
+
+\begin_layout Abstract
+We use a 1-Dimensional model of the tubelight.
+ A uniform electric ﬁeld is present, that accelerates electrons.
+ Electrons are emitted by the cathode with zero energy, and accelerate in
+ this ﬁeld.
+ When they get beyond a threshold energy 
+\begin_inset Formula $E_{0}$
+\end_inset
+
+, they can drive atoms to excited states.
+ The relaxation of these atoms results in light emission.
+ In our model, we will assume that the relaxation is immediate.
+ The electron loses all its energy and the process starts again.
+ Electrons reaching the anode are absorbed and lost.
+ Each “time step”, an average of 
+\begin_inset Formula $N$
+\end_inset
+
+ electrons are introduced at the cathode.
+ We will conclude with population plots and the intensity data table.
+\end_layout
+
+\begin_layout Section*
+Program
+\end_layout
+
+\begin_layout Standard
+We include the shebang and import out libraries
+\end_layout
+
+\begin_layout Subsection*
+Code
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+#! usr/bin/python
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+import sys
+\end_layout
+
+\begin_layout Scrap
+
+from scipy import *
+\end_layout
+
+\begin_layout Scrap
+
+from matplotlib.pyplot import *
+\end_layout
+
+\begin_layout Scrap
+
+from matplotlib.mlab import *
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now, we facilitate taking arguements from the command line and account for
+ erraneous input.
+ We also declare our vector arrays with all zeroes.
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+<<declaration>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# Take arguements from command line
+\end_layout
+
+\begin_layout Scrap
+
+try:
+\end_layout
+
+\begin_layout Scrap
+
+    n=int(sys.argv[1]) # spatial grid size
+\end_layout
+
+\begin_layout Scrap
+
+    M=int(sys.argv[2]) # number of electrons injected per turn
+\end_layout
+
+\begin_layout Scrap
+
+    nk=int(sys.argv[3]) # number of turns to simulate 
+\end_layout
+
+\begin_layout Scrap
+
+    u0=int(sys.argv[4]) # threshold activity
+\end_layout
+
+\begin_layout Scrap
+
+    p=float(sys.argv[5]) # probability that ionisation will occur
+\end_layout
+
+\begin_layout Scrap
+
+except:
+\end_layout
+
+\begin_layout Scrap
+
+    print "Invalid values"    
+\end_layout
+
+\begin_layout Scrap
+
+    n=100
+\end_layout
+
+\begin_layout Scrap
+
+    M=5
+\end_layout
+
+\begin_layout Scrap
+
+    nk=500
+\end_layout
+
+\begin_layout Scrap
+
+    u0=7 
+\end_layout
+
+\begin_layout Scrap
+
+    p=0.5 
+\end_layout
+
+\begin_layout Scrap
+
+    print "Taking default values n=%d, M=%d, nk=%d, u0=%d, p=%f" %(n,M,nk,u0,p)
+    
+\end_layout
+
+\begin_layout Scrap
+
+    
+\end_layout
+
+\begin_layout Scrap
+
+xx=zeros(n*M) # Electron Position
+\end_layout
+
+\begin_layout Scrap
+
+u=zeros(n*M) # Electron Velocity
+\end_layout
+
+\begin_layout Scrap
+
+dx=zeros(n*M) # Displacement in current turn
+\end_layout
+
+\begin_layout Scrap
+
+I=[] # Intensity
+\end_layout
+
+\begin_layout Scrap
+
+X=[] # Electron position
+\end_layout
+
+\begin_layout Scrap
+
+V=[] # Electron velocity
+\end_layout
+
+\begin_layout Scrap
+
+           
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This is our for loop.
+ We carry out several simultaneous processes here.
+ 
+\end_layout
+
+\begin_layout Enumerate
+We first find all electrons which are in the chamber.
+ We add their positions and velocities to the respective arrays.
+\end_layout
+
+\begin_layout Enumerate
+We check for electrons that have reached the end of the chamber and reset
+ them.
+\end_layout
+
+\begin_layout Enumerate
+We then check for electrons that have more than critical velocity and are
+ capable of ionizing the atoms
+\end_layout
+
+\begin_layout Enumerate
+We use an approximate method to find out how many such electrons will actually
+ ionize.
+\end_layout
+
+\begin_layout Enumerate
+We then update all electrons in the chamber to our arrays.
+\end_layout
+
+\begin_layout Scrap
+
+<<loop>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+for k in range(nk):
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Check for electrons which are in the chamber
+\end_layout
+
+\begin_layout Scrap
+
+	ii=where(xx>0);
+\end_layout
+
+\begin_layout Scrap
+
+	dx[ii]=u[ii]+0.5
+\end_layout
+
+\begin_layout Scrap
+
+	xx[ii]=xx[ii]+dx[ii]
+\end_layout
+
+\begin_layout Scrap
+
+	u[ii]=u[ii]+1
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Check for electrons that have reached the end
+\end_layout
+
+\begin_layout Scrap
+
+	end=where(xx>=n)
+\end_layout
+
+\begin_layout Scrap
+
+	xx[end]=0
+\end_layout
+
+\begin_layout Scrap
+
+	u[end]=0
+\end_layout
+
+\begin_layout Scrap
+
+	dx[end]=0
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Check for electrons having more than critical velocity
+\end_layout
+
+\begin_layout Scrap
+
+	active=where(u>=u0)
+\end_layout
+
+\begin_layout Scrap
+
+	ion=where(rand(len(active[0]))<=p);
+\end_layout
+
+\begin_layout Scrap
+
+	index=active[0][ion]
+\end_layout
+
+\begin_layout Scrap
+
+	u[index]=0
+\end_layout
+
+\begin_layout Scrap
+
+	xx[index]=xx[index]-rand(len(index))*dx[index]
+\end_layout
+
+\begin_layout Scrap
+
+	I.extend(xx[index].tolist())
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Random distribution of injected electrons
+\end_layout
+
+\begin_layout Scrap
+
+	pos=where(xx==0)
+\end_layout
+
+\begin_layout Scrap
+
+	if len(pos[0])<M:
+\end_layout
+
+\begin_layout Scrap
+
+	xx[pos]=1
+\end_layout
+
+\begin_layout Scrap
+
+	else:
+\end_layout
+
+\begin_layout Scrap
+
+	xx[pos[0][:randn()*2+10]]=1
+\end_layout
+
+\begin_layout Scrap
+
+	pos = where(xx>0) 
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Position and velocity
+\end_layout
+
+\begin_layout Scrap
+
+	X.extend(xx[pos].tolist())
+\end_layout
+
+\begin_layout Scrap
+
+	V.extend(u[pos].tolist())
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+These are the plotting functions that plots the following:
+\end_layout
+
+\begin_layout Itemize
+Population plot of electron position.
+\end_layout
+
+\begin_layout Itemize
+Population plot of electron intensity.
+\end_layout
+
+\begin_layout Itemize
+Plot of electron's position and velocity
+\end_layout
+
+\begin_layout Itemize
+Plot off the array of the history of all positions and velocity.
+\end_layout
+
+\begin_layout Itemize
+We also form a two column matrix of intensity and electron count and store
+ it in a file.
+\end_layout
+
+\begin_layout Scrap
+
+<<plot>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# Population plot    
+\end_layout
+
+\begin_layout Scrap
+
+figure(0)
+\end_layout
+
+\begin_layout Scrap
+
+hist(X,bins=n)
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Intensity plot
+\end_layout
+
+\begin_layout Scrap
+
+figure(1)
+\end_layout
+
+\begin_layout Scrap
+
+hist(I,bins=n)
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r"x")
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r"I")
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Obtaining table from hist and saving
+\end_layout
+
+\begin_layout Scrap
+
+bins=hist(I,bins=n)[1]
+\end_layout
+
+\begin_layout Scrap
+
+xpos=(0.5)*(bins[0:-1]+bins[1:])
+\end_layout
+
+\begin_layout Scrap
+
+count=hist(I,bins=n)[0]
+\end_layout
+
+\begin_layout Scrap
+
+x=hstack((xpos.reshape((n,1)),count.reshape((n,1))))
+\end_layout
+
+\begin_layout Scrap
+
+savetxt("intensity.dat",c_[xpos,count])
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting electron phase space
+\end_layout
+
+\begin_layout Scrap
+
+figure(2)
+\end_layout
+
+\begin_layout Scrap
+
+plot(xx,u,"x")
+\end_layout
+
+\begin_layout Scrap
+
+xlabel('x')
+\end_layout
+
+\begin_layout Scrap
+
+ylabel('velocity')
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting electron phase space (TOTAL)
+\end_layout
+
+\begin_layout Scrap
+
+figure(3)
+\end_layout
+
+\begin_layout Scrap
+
+plot(X,V,"x")
+\end_layout
+
+\begin_layout Scrap
+
+xlabel('x')
+\end_layout
+
+\begin_layout Scrap
+
+ylabel('velocity')
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+show()
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename position.png
+	scale 60
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Position plot
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename intensity.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Intensity Plot
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Position and Intensity Plots
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename elecphase.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+After simulation
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename elecphaseall.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+For all time
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Electron Phase plots
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\end_body
+\end_document

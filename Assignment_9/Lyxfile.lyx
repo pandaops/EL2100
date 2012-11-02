@@ -1,0 +1,763 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass literate-article
+\use_default_options true
+\maintain_unincluded_children false
+\language canadian
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics pdftex
+\default_output_format default
+\output_sync 1
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.5cm
+\topmargin 1.5cm
+\rightmargin 1.5cm
+\bottommargin 0.5cm
+\headheight 0.5cm
+\headsep 0.5cm
+\footskip 0.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Python Assignment -3
+\end_layout
+
+\begin_layout Author
+Swapnil Basak
+\end_layout
+
+\begin_layout Date
+EE11B122, IIT Madras
+\end_layout
+
+\begin_layout Abstract
+Put abstract here.
+\end_layout
+
+\begin_layout Section*
+Program
+\end_layout
+
+\begin_layout Standard
+We include the shebang and import out libraries
+\end_layout
+
+\begin_layout Subsection*
+Code
+\end_layout
+
+\begin_layout Scrap
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+#! usr/bin/python
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+from scipy import *
+\end_layout
+
+\begin_layout Scrap
+import sys
+\end_layout
+
+\begin_layout Scrap
+import matplotlib.pyplot as graph
+\end_layout
+
+\begin_layout Scrap
+import scipy.special as sp
+\end_layout
+
+\begin_layout Scrap
+from scipy.linalg import lstsq
+\end_layout
+
+\begin_layout Scrap
+import numpy as np
+\end_layout
+
+\begin_layout Scrap
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now, we set our constants and load the fitting.dat file.
+ we read in the data column by column
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+<<program>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+A = 1
+\end_layout
+
+\begin_layout Scrap
+B = -0.02546303
+\end_layout
+
+\begin_layout Scrap
+# 2.
+ loading file and reshaping
+\end_layout
+
+\begin_layout Scrap
+L = loadtxt('fitting.dat'.unpack=True)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We then declare the computing function to see the amount of noise added.
+\end_layout
+
+\begin_layout Scrap
+<<function>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 4.
+ Declare the function g and compute
+\end_layout
+
+\begin_layout Scrap
+def g(t,a,b):
+\end_layout
+
+\begin_layout Scrap
+        g = a*sp.jn(2,t) + b*t 
+\end_layout
+
+\begin_layout Scrap
+        return g;
+\end_layout
+
+\begin_layout Scrap
+real_values = g(L[0],A,B).reshape(101,-1)
+\end_layout
+
+\begin_layout Scrap
+        
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We then plot the graph denoting the various levels of noise.
+ 
+\end_layout
+
+\begin_layout Scrap
+<<noise>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 3.
+ Plotting with varying levels of noise
+\end_layout
+
+\begin_layout Scrap
+graph.figure(1)
+\end_layout
+
+\begin_layout Scrap
+graph.xlabel('$t$')
+\end_layout
+
+\begin_layout Scrap
+graph.ylabel('$F_
+\backslash
+sigma$')
+\end_layout
+
+\begin_layout Scrap
+for i in range(1,9,2):
+\end_layout
+
+\begin_layout Scrap
+    graph.plot(L[0],L[i],'+')
+\end_layout
+
+\begin_layout Scrap
+    graph.plot(L[0],L[i+1],'.')
+\end_layout
+
+\begin_layout Scrap
+graph.plot(L[0],real_values,'k')
+\end_layout
+
+\begin_layout Scrap
+graph.legend(('$log(
+\backslash
+sigma) = -1$','$log(
+\backslash
+sigma) = -0.5$','$log(
+\backslash
+sigma) = 0$',
+\end_layout
+
+\begin_layout Scrap
+'$log(
+\backslash
+sigma) = 0.5$','$log(
+\backslash
+sigma) = 1$','$log(
+\backslash
+sigma) = 1.5$','$log(
+\backslash
+sigma) = 2$',
+\end_layout
+
+\begin_layout Scrap
+'$log(
+\backslash
+sigma) = 2.5$','$log(
+\backslash
+sigma) = 3$','Actual function'),loc=0)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now we write another method to calculate the value of G through matrices.
+ We then output true if the matrix and the function result are the same.
+\end_layout
+
+\begin_layout Scrap
+<<matrix>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 5.
+ Compute G with the matrix method
+\end_layout
+
+\begin_layout Scrap
+j = sp.jn(2,L[0])
+\end_layout
+
+\begin_layout Scrap
+M = c_[j,L[0]]
+\end_layout
+
+\begin_layout Scrap
+AB = [[A],[B]]
+\end_layout
+
+\begin_layout Scrap
+g_alt = dot(M,AB)
+\end_layout
+
+\begin_layout Scrap
+if all(g_alt)==all(real_values):
+\end_layout
+
+\begin_layout Scrap
+    print "Matrix and Algebraic methods both give equal values"
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now we calculate Epsilon(
+\begin_inset Formula $\varepsilon\left[i\right]\left[j\right]$
+\end_inset
+
+), the mean squared error over an uniformly distributed interval of A and
+ B.
+\end_layout
+
+\begin_layout Scrap
+<<error>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+AA=arange(0,2.1,0.1)
+\end_layout
+
+\begin_layout Scrap
+BB=arange(-.05,0.0025,0.0025)
+\end_layout
+
+\begin_layout Scrap
+epsilon = np.zeros((len(AA),len(BB)))
+\end_layout
+
+\begin_layout Scrap
+sum1 = 0
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+# 6.
+ Computing the mean squared error
+\end_layout
+
+\begin_layout Scrap
+for a in range(len(AA)):
+\end_layout
+
+\begin_layout Scrap
+        for b in range(len(BB)):
+\end_layout
+
+\begin_layout Scrap
+                epsilon[a][b]=sum((L[1] - g(L[0],AA[a],BB[b]))**2)
+\end_layout
+
+\begin_layout Scrap
+epsilon/=101
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Once we have the Epsilon plot, we plot it's contour plot to analyze it with
+ A and B.
+\end_layout
+
+\begin_layout Scrap
+<<contour>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 7.
+ Plotting the Countour
+\end_layout
+
+\begin_layout Scrap
+graph.figure(2)
+\end_layout
+
+\begin_layout Scrap
+graph.contour(BB,AA,epsilon)
+\end_layout
+
+\begin_layout Scrap
+graph.xlabel('$A$')
+\end_layout
+
+\begin_layout Scrap
+graph.ylabel('$B$')
+\end_layout
+
+\begin_layout Scrap
+graph.title('Contour plot of A and B')
+\end_layout
+
+\begin_layout Scrap
+p=[]
+\end_layout
+
+\begin_layout Scrap
+errors =[]
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We now estimate the error using the method of least squares.
+ We use scipy's inbuilt 
+\begin_inset Formula $lstsq$
+\end_inset
+
+ function for this.
+ We then store the error in an error array.
+ We then go ahead and plot and error estimate both on a normal axis and
+ a loglog axis.
+ We see that both these plots are best fit lines.
+\end_layout
+
+\begin_layout Scrap
+<<estimate>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 8., 9.
+ Estimating error
+\end_layout
+
+\begin_layout Scrap
+for x in range(1,10):
+\end_layout
+
+\begin_layout Scrap
+    least=lstsq(M,L[x].reshape(101,-1))[0]
+\end_layout
+
+\begin_layout Scrap
+    p.append(least)
+\end_layout
+
+\begin_layout Scrap
+    err = sqrt(dot(transpose(dot(M,least) - L[x].reshape(101,-1)),dot(M,least)
+ - L[x].reshape(101,-1)))        
+\end_layout
+
+\begin_layout Scrap
+    errors=append(errors,err[0][0])
+\end_layout
+
+\begin_layout Scrap
+p=array(p)
+\end_layout
+
+\begin_layout Scrap
+sigma = logspace(-1,-3,9)
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+# 9.
+ Plotting normal error 
+\end_layout
+
+\begin_layout Scrap
+graph.figure(3)
+\end_layout
+
+\begin_layout Scrap
+graph.plot(sigma,errors)
+\end_layout
+
+\begin_layout Scrap
+graph.plot(sigma,errors,'ro')
+\end_layout
+
+\begin_layout Scrap
+graph.xlabel(r"noise $
+\backslash
+sigma$")
+\end_layout
+
+\begin_layout Scrap
+graph.ylabel('error')
+\end_layout
+
+\begin_layout Scrap
+graph.title('Plot of error in estimate of A and B vs noise')
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+# 10.
+ Logarithmic error
+\end_layout
+
+\begin_layout Scrap
+graph.figure(4)
+\end_layout
+
+\begin_layout Scrap
+graph.loglog(sigma,errors)
+\end_layout
+
+\begin_layout Scrap
+graph.loglog(sigma,errors,'ro')
+\end_layout
+
+\begin_layout Scrap
+graph.xlabel(r"log($
+\backslash
+sigma$)")
+\end_layout
+
+\begin_layout Scrap
+graph.ylabel('log(error)')
+\end_layout
+
+\begin_layout Scrap
+graph.title('Plot of logarithmic error in estimate of A and B vs noise')
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We now go to the exponents that will optimize the expressions 
+\begin_inset Formula $abcde.$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+<<alphabeta>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 11.
+ Finding the exponents
+\end_layout
+
+\begin_layout Scrap
+noise=log(sigma).reshape((len(log(sigma)),1))
+\end_layout
+
+\begin_layout Scrap
+sigma=hstack((ones((len(log(sigma)),1)),noise))
+\end_layout
+
+\begin_layout Scrap
+solution=lstsq(sigma,log(errors))
+\end_layout
+
+\begin_layout Scrap
+print 'Alpha=%f'%pow(e,solution[0][0])
+\end_layout
+
+\begin_layout Scrap
+print 'Beta=%f'%solution[0][1]
+\end_layout
+
+\begin_layout Scrap
+graph.show()
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename noise.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Noise plot
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename contour.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Electron Phase plots
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename normal.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Normal plot
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename loglog.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+LogLog plots
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Normal and LogLog plots
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

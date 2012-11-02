@@ -72,7 +72,9 @@ sigma = logspace(-1,-3,9)
 
 # 9. Plotting normal error 
 graph.figure(3)
-graph.plot(sigma,errors)
+A = np.vstack([sigma, np.ones(len(sigma))]).T
+m, c = np.linalg.lstsq(A, errors)[0]
+graph.plot(sigma, m*sigma + c, 'k', label='Fitted line')
 graph.plot(sigma,errors,'ro')
 graph.xlabel(r"noise $\sigma$")
 graph.ylabel('error')
@@ -80,7 +82,7 @@ graph.title('Plot of error in estimate of A and B vs noise')
 
 # 10. Logarithmic error
 graph.figure(4)
-graph.loglog(sigma,errors)
+graph.loglog(sigma,errors,'k')
 graph.loglog(sigma,errors,'ro')
 graph.xlabel(r"log($\sigma$)")
 graph.ylabel('log(error)')
