@@ -68,7 +68,7 @@
 \begin_body
 
 \begin_layout Title
-Python Assignment -2
+Python Assignment -3
 \end_layout
 
 \begin_layout Author
@@ -80,8 +80,7 @@ EE11B122, IIT Madras
 \end_layout
 
 \begin_layout Abstract
-We demonstrate the quad() function to evaluate integrals and also do error
- analysis on recursive sums using the Trapezoidal method.
+Put abstract here.
 \end_layout
 
 \begin_layout Section*
@@ -113,11 +112,11 @@ Code
 \end_layout
 
 \begin_layout Scrap
-from scipy.integrate import quad
+from scipy import *
 \end_layout
 
 \begin_layout Scrap
-from scipy import linspace, cumsum, where
+import sys
 \end_layout
 
 \begin_layout Scrap
@@ -129,7 +128,11 @@ import scipy.special as sp
 \end_layout
 
 \begin_layout Scrap
-from numpy import fabs 	
+from scipy.linalg import lstsq
+\end_layout
+
+\begin_layout Scrap
+import numpy as np
 \end_layout
 
 \begin_layout Scrap
@@ -140,9 +143,8 @@ from numpy import fabs
 \end_layout
 
 \begin_layout Standard
-Now, we set our constants and describe the function that the quad routine
- will use.
- We also declare the vectors that we will be using throughout this program.
+Now, we set our constants and load the fitting.dat file.
+ we read in the data column by column
 \end_layout
 
 \begin_layout Scrap
@@ -158,92 +160,20 @@ Now, we set our constants and describe the function that the quad routine
 \end_layout
 
 \begin_layout Scrap
-# The function that Quad uses
+A = 1
 \end_layout
 
 \begin_layout Scrap
-func=lambda x: 1/(1+x**2)
+B = -0.02546303
 \end_layout
 
 \begin_layout Scrap
-step=0.1
+# 2.
+ loading file and reshaping
 \end_layout
 
 \begin_layout Scrap
-err=1
-\end_layout
-
-\begin_layout Scrap
-counter=0
-\end_layout
-
-\begin_layout Scrap
-steps = []
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-samples=sp.arange(0,5+step,step)
-\end_layout
-
-\begin_layout Scrap
-results = sp.linspace(0,0,len(samples))
-\end_layout
-
-\begin_layout Scrap
-manual= sp.linspace(0,0,len(samples))
-\end_layout
-
-\begin_layout Scrap
-estimated_errors, real_errors=[],[]
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-@
-\end_layout
-
-\begin_layout Standard
-We then decalre the computing function that takes in two arguements and
- applie dthe 
-\begin_inset Formula $quad()$
-\end_inset
-
- routine and returns the result array.
-\end_layout
-
-\begin_layout Scrap
-<<quadfunc>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-def integrate(samples,results):
-\end_layout
-
-\begin_layout Scrap
-	for i in range(len(samples)):
-\end_layout
-
-\begin_layout Scrap
-	# Compute Results with Quad
-\end_layout
-
-\begin_layout Scrap
-	    results[i]=quad(func,0,samples[i])[0]
-\end_layout
-
-\begin_layout Scrap
-	return results
+L = loadtxt('fitting.dat'.unpack=True)
 \begin_inset Newline newline
 \end_inset
 
@@ -251,13 +181,11 @@ def integrate(samples,results):
 \end_layout
 
 \begin_layout Standard
-We then declare the function that calculates the above integral using the
- trapezoidal step algorithm.
- It says that
+We then declare the computing function to see the amount of noise added.
 \end_layout
 
 \begin_layout Scrap
-<<cumsum>>=
+<<function>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -265,58 +193,28 @@ We then declare the function that calculates the above integral using the
 \end_layout
 
 \begin_layout Scrap
-def series(new_samples,new_results):
+# 4.
+ Declare the function g and compute
 \end_layout
 
 \begin_layout Scrap
-    # Compute manually using recursive summation
+def g(t,a,b):
 \end_layout
 
 \begin_layout Scrap
-    new_results=step*(cumsum(func(new_samples)) - 0.5*(func(min(new_samples))+fun
-c(new_samples)))
+        g = a*sp.jn(2,t) + b*t 
 \end_layout
 
 \begin_layout Scrap
-    return new_results
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-Now we write another function that increases our sample size by halving
- the step interval.
- It returns a tuple both of the new sample set and result array
+        return g;
 \end_layout
 
 \begin_layout Scrap
-<<ftrap>>=
-\begin_inset Newline newline
-\end_inset
-
-
+real_values = g(L[0],A,B).reshape(101,-1)
 \end_layout
 
 \begin_layout Scrap
-def ftrap(oldx,oldy):
-\end_layout
-
-\begin_layout Scrap
-    # Return double of the sample size
-\end_layout
-
-\begin_layout Scrap
-    newx = sp.arange(oldx[0],oldx[-1]+(0.5)*step,0.5*step)
-\end_layout
-
-\begin_layout Scrap
-    newy = sp.linspace(0,0,len(newx))
-\end_layout
-
-\begin_layout Scrap
-    return (newx,newy)
+        
 \begin_inset Newline newline
 \end_inset
 
@@ -324,11 +222,140 @@ def ftrap(oldx,oldy):
 \end_layout
 
 \begin_layout Standard
-Now we calculate the maximum error for common points in the old and the
- new array.
- We do this using python list slicing in steps and list comprehension.
- We also calculate the actual value of the function by evaluating our sample
- set with the inbuilt arctan function.
+We then plot the graph denoting the various levels of noise.
+ 
+\end_layout
+
+\begin_layout Scrap
+<<noise>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 3.
+ Plotting with varying levels of noise
+\end_layout
+
+\begin_layout Scrap
+graph.figure(1)
+\end_layout
+
+\begin_layout Scrap
+graph.xlabel('$t$')
+\end_layout
+
+\begin_layout Scrap
+graph.ylabel('$F_
+\backslash
+sigma$')
+\end_layout
+
+\begin_layout Scrap
+for i in range(1,9,2):
+\end_layout
+
+\begin_layout Scrap
+    graph.plot(L[0],L[i],'+')
+\end_layout
+
+\begin_layout Scrap
+    graph.plot(L[0],L[i+1],'.')
+\end_layout
+
+\begin_layout Scrap
+graph.plot(L[0],real_values,'k')
+\end_layout
+
+\begin_layout Scrap
+graph.legend(('$log(
+\backslash
+sigma) = -1$','$log(
+\backslash
+sigma) = -0.5$','$log(
+\backslash
+sigma) = 0$',
+\end_layout
+
+\begin_layout Scrap
+'$log(
+\backslash
+sigma) = 0.5$','$log(
+\backslash
+sigma) = 1$','$log(
+\backslash
+sigma) = 1.5$','$log(
+\backslash
+sigma) = 2$',
+\end_layout
+
+\begin_layout Scrap
+'$log(
+\backslash
+sigma) = 2.5$','$log(
+\backslash
+sigma) = 3$','Actual function'),loc=0)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now we write another method to calculate the value of G through matrices.
+ We then output true if the matrix and the function result are the same.
+\end_layout
+
+\begin_layout Scrap
+<<matrix>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 5.
+ Compute G with the matrix method
+\end_layout
+
+\begin_layout Scrap
+j = sp.jn(2,L[0])
+\end_layout
+
+\begin_layout Scrap
+M = c_[j,L[0]]
+\end_layout
+
+\begin_layout Scrap
+AB = [[A],[B]]
+\end_layout
+
+\begin_layout Scrap
+g_alt = dot(M,AB)
+\end_layout
+
+\begin_layout Scrap
+if all(g_alt)==all(real_values):
+\end_layout
+
+\begin_layout Scrap
+    print "Matrix and Algebraic methods both give equal values"
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now we calculate Epsilon(
+\begin_inset Formula $\varepsilon\left[i\right]\left[j\right]$
+\end_inset
+
+), the mean squared error over an uniformly distributed interval of A and
+ B.
 \end_layout
 
 \begin_layout Scrap
@@ -340,31 +367,19 @@ Now we calculate the maximum error for common points in the old and the
 \end_layout
 
 \begin_layout Scrap
-def error(old,new):
+AA=arange(0,2.1,0.1)
 \end_layout
 
 \begin_layout Scrap
-    # Return the Max absolute value
+BB=arange(-.05,0.0025,0.0025)
 \end_layout
 
 \begin_layout Scrap
-    if new is None:
+epsilon = np.zeros((len(AA),len(BB)))
 \end_layout
 
 \begin_layout Scrap
-        return 1
-\end_layout
-
-\begin_layout Scrap
-    new=new[::2]
-\end_layout
-
-\begin_layout Scrap
-    err = max([abs(val) for val in new-old])
-\end_layout
-
-\begin_layout Scrap
-    return err
+sum1 = 0
 \end_layout
 
 \begin_layout Scrap
@@ -372,19 +387,24 @@ def error(old,new):
 \end_layout
 
 \begin_layout Scrap
-
+# 6.
+ Computing the mean squared error
 \end_layout
 
 \begin_layout Scrap
-results = integrate(samples,results)
+for a in range(len(AA)):
 \end_layout
 
 \begin_layout Scrap
-preset = sp.arctan(samples)
+        for b in range(len(BB)):
 \end_layout
 
 \begin_layout Scrap
-preset_errors = [fabs(x) for x in results-preset]
+                epsilon[a][b]=sum((L[1] - g(L[0],AA[a],BB[b]))**2)
+\end_layout
+
+\begin_layout Scrap
+epsilon/=101
 \begin_inset Newline newline
 \end_inset
 
@@ -392,26 +412,12 @@ preset_errors = [fabs(x) for x in results-preset]
 \end_layout
 
 \begin_layout Standard
-Before we move on to minimizing error, we store the current values of the
- 
-\begin_inset Formula $quad()$
-\end_inset
-
- with the preset values of the function.
- We also plot a graph to analyze the semilogy plot of the errors between
- the 
-\begin_inset Formula $quad$
-\end_inset
-
- function and the 
-\begin_inset Formula $arctan$
-\end_inset
-
- function.
+Once we have the Epsilon plot, we plot it's contour plot to analyze it with
+ A and B.
 \end_layout
 
 \begin_layout Scrap
-<<graphs_1>>=
+<<contour>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -419,31 +425,8 @@ Before we move on to minimizing error, we store the current values of the
 \end_layout
 
 \begin_layout Scrap
-graph.figure(1)
-\end_layout
-
-\begin_layout Scrap
-graph.plot(samples,results,'ro',samples,preset,'k')
-\end_layout
-
-\begin_layout Scrap
-graph.legend(('quad fn',r'$tan^{-1}(x)$'))
-\end_layout
-
-\begin_layout Scrap
-graph.title(r'Plot of $1/(1+t^{2})$')
-\end_layout
-
-\begin_layout Scrap
-graph.xlabel(r'$x$')
-\end_layout
-
-\begin_layout Scrap
-graph.ylabel('quad fn')
-\end_layout
-
-\begin_layout Scrap
-
+# 7.
+ Plotting the Countour
 \end_layout
 
 \begin_layout Scrap
@@ -451,37 +434,27 @@ graph.figure(2)
 \end_layout
 
 \begin_layout Scrap
-graph.semilogy(samples,preset_errors,'ro')
+graph.contour(BB,AA,epsilon)
 \end_layout
 
 \begin_layout Scrap
-graph.xlabel(r'$x$')
+graph.xlabel('$A$')
 \end_layout
 
 \begin_layout Scrap
-graph.ylabel('Error')
+graph.ylabel('$B$')
 \end_layout
 
 \begin_layout Scrap
-graph.title(r'Error in $
-\backslash
-int_{0}^{x}dt/(1+t^{2})$')
+graph.title('Contour plot of A and B')
 \end_layout
 
 \begin_layout Scrap
-
+p=[]
 \end_layout
 
 \begin_layout Scrap
-results = series(samples,manual)
-\end_layout
-
-\begin_layout Scrap
-new_samples=samples
-\end_layout
-
-\begin_layout Scrap
-new_results=results
+errors =[]
 \begin_inset Newline newline
 \end_inset
 
@@ -489,28 +462,16 @@ new_results=results
 \end_layout
 
 \begin_layout Standard
-We now estimate the error using the method of vectors and recursive iteration.
- We state that we want an 
-\begin_inset Formula $\varepsilon$
+We now estimate the error using the method of least squares.
+ We use scipy's inbuilt 
+\begin_inset Formula $lstsq$
 \end_inset
 
- < 
-\begin_inset Formula $10^{-8}$
-\end_inset
-
- or a maximium of 9 iterations.
- Each iteration, we call 
-\begin_inset Formula $ftrap()$
-\end_inset
-
- and double the sample set to increase accuracy.
- We then calculate and store two different errors - the error between common
- points and the error with the preset 
-\begin_inset Formula $arctan()$
-\end_inset
-
- function\SpecialChar \@.
-
+ function for this.
+ We then store the error in an error array.
+ We then go ahead and plot and error estimate both on a normal axis and
+ a loglog axis.
+ We see that both these plots are best fit lines.
 \end_layout
 
 \begin_layout Scrap
@@ -522,104 +483,72 @@ We now estimate the error using the method of vectors and recursive iteration.
 \end_layout
 
 \begin_layout Scrap
-# Keep doing until error is below tolerance or counter reaches 9
+# 8., 9.
+ Estimating error
 \end_layout
 
 \begin_layout Scrap
-while(err>pow(10,-7)):
+for x in range(1,10):
 \end_layout
 
 \begin_layout Scrap
-    counter+=1
+    least=lstsq(M,L[x].reshape(101,-1))[0]
 \end_layout
 
 \begin_layout Scrap
-    if counter>9:
+    p.append(least)
 \end_layout
 
 \begin_layout Scrap
-        break
+    err = sqrt(dot(transpose(dot(M,least) - L[x].reshape(101,-1)),dot(M,least)
+ - L[x].reshape(101,-1)))        
 \end_layout
 
 \begin_layout Scrap
-    new_samples,new_results=ftrap(samples,results)
+    errors=append(errors,err[0][0])
 \end_layout
 
 \begin_layout Scrap
-    step = step/2
+p=array(p)
 \end_layout
 
 \begin_layout Scrap
-    steps.append(step)
+sigma = logspace(-1,-3,9)
 \end_layout
 
 \begin_layout Scrap
-    new_results = series(new_samples,new_results)
+
 \end_layout
 
 \begin_layout Scrap
-    if counter==1:
+# 9.
+ Plotting normal error 
 \end_layout
 
 \begin_layout Scrap
-        graph.figure(3)
+graph.figure(3)
 \end_layout
 
 \begin_layout Scrap
-        graph.plot(new_samples,new_results,'ro',samples,preset,'k')
+graph.plot(sigma,errors)
 \end_layout
 
 \begin_layout Scrap
-        graph.xlabel(r'$x$')
+graph.plot(sigma,errors,'ro')
 \end_layout
 
 \begin_layout Scrap
-        graph.ylabel(r'$
+graph.xlabel(r"noise $
 \backslash
-int_{0}^{x}
-\backslash
-frac{dt}{(1+t^{2})}$')
+sigma$")
 \end_layout
 
 \begin_layout Scrap
-        graph.title('Integration using Trapezoidal Rule') 
+graph.ylabel('error')
 \end_layout
 
 \begin_layout Scrap
-    err = error(results,new_results)
-\end_layout
-
-\begin_layout Scrap
-    samples=new_samples
-\end_layout
-
-\begin_layout Scrap
-    results=new_results
-\end_layout
-
-\begin_layout Scrap
-    preset = sp.arctan(new_samples)
-\end_layout
-
-\begin_layout Scrap
-    real_errors.append(max([fabs(x) for x in new_results-preset]))
-\end_layout
-
-\begin_layout Scrap
-    estimated_errors.append(err)
-\end_layout
-
-\begin_layout Scrap
-    print "Running Ftrap iteration", counter 
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-Finally, we plot the loglog plot of the two different types of errors and
- we see the similarity in their nature.
+graph.title('Plot of error in estimate of A and B vs noise')
 \end_layout
 
 \begin_layout Scrap
@@ -627,11 +556,8 @@ Finally, we plot the loglog plot of the two different types of errors and
 \end_layout
 
 \begin_layout Scrap
-<<graphs_2>>=
-\begin_inset Newline newline
-\end_inset
-
-
+# 10.
+ Logarithmic error
 \end_layout
 
 \begin_layout Scrap
@@ -639,25 +565,74 @@ graph.figure(4)
 \end_layout
 
 \begin_layout Scrap
-graph.title(r'Error in $
+graph.loglog(sigma,errors)
+\end_layout
+
+\begin_layout Scrap
+graph.loglog(sigma,errors,'ro')
+\end_layout
+
+\begin_layout Scrap
+graph.xlabel(r"log($
 \backslash
-int_{0}^{x}dt/(1+t^{2})$')
+sigma$)")
 \end_layout
 
 \begin_layout Scrap
-graph.xlabel(r'$log(x)$')
+graph.ylabel('log(error)')
 \end_layout
 
 \begin_layout Scrap
-graph.ylabel(r'Log(Error)')
+graph.title('Plot of logarithmic error in estimate of A and B vs noise')
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We now go to the exponents that will optimize the expressions 
+\begin_inset Formula $abcde.$
+\end_inset
+
+
 \end_layout
 
 \begin_layout Scrap
-graph.loglog(steps,estimated_errors,'ro',steps,real_errors,'+')
+
 \end_layout
 
 \begin_layout Scrap
-graph.legend(('Exact error','Estimated error'))
+<<alphabeta>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+# 11.
+ Finding the exponents
+\end_layout
+
+\begin_layout Scrap
+noise=log(sigma).reshape((len(log(sigma)),1))
+\end_layout
+
+\begin_layout Scrap
+sigma=hstack((ones((len(log(sigma)),1)),noise))
+\end_layout
+
+\begin_layout Scrap
+solution=lstsq(sigma,log(errors))
+\end_layout
+
+\begin_layout Scrap
+print 'Alpha=%f'%pow(e,solution[0][0])
+\end_layout
+
+\begin_layout Scrap
+print 'Beta=%f'%solution[0][1]
 \end_layout
 
 \begin_layout Scrap
@@ -676,7 +651,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename quad.png
+	filename noise.png
 	scale 60
 
 \end_inset
@@ -688,7 +663,7 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Plot of Quad with arctan
+Noise plot
 \end_layout
 
 \end_inset
@@ -709,7 +684,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename semilog.png
+	filename contour.png
 
 \end_inset
 
@@ -720,7 +695,7 @@ status open
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Semilog plot of the error
+Electron Phase plots
 \end_layout
 
 \end_inset
@@ -741,7 +716,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename Trapezoid.png
+	filename normal.png
 	scale 60
 
 \end_inset
@@ -750,14 +725,12 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-Plot of the trapezoidal series.
- As we can see, it is remarkably accurate.
- 
+Normal plot
 \end_layout
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename error_estimate.png
+	filename loglog.png
 	scale 60
 
 \end_inset
@@ -773,7 +746,7 @@ LogLog plots
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Normal plot of the trapezoidal method and LogLog plots of the errors
+Normal and LogLog plots
 \end_layout
 
 \end_inset

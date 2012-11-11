@@ -1,0 +1,1315 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass literate-article
+\use_default_options true
+\maintain_unincluded_children false
+\language canadian
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics pdftex
+\default_output_format default
+\output_sync 1
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.5cm
+\topmargin 1.5cm
+\rightmargin 1.5cm
+\bottommargin 0.5cm
+\headheight 0.5cm
+\headsep 0.5cm
+\footskip 0.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Python Assignment -5
+\end_layout
+
+\begin_layout Author
+Swapnil Basak
+\end_layout
+
+\begin_layout Date
+EE11B122, IIT Madras
+\end_layout
+
+\begin_layout Abstract
+In this assignment, we solve for the currents in a resistor.
+ The currents depend on the shape of the resistor and we want to see if
+ 
+\begin_inset Formula $R=\rho\dfrac{L}{A}$
+\end_inset
+
+ works or not.
+ 
+\end_layout
+
+\begin_layout Section
+Taking in the default values
+\end_layout
+
+\begin_layout Standard
+Firstly, the default values of the corresponding elements are taken.
+\end_layout
+
+\begin_layout Subsection
+Pseudo Code
+\end_layout
+
+\begin_layout LyX-Code
+
+\lang english
+Load the required modules
+\end_layout
+
+\begin_layout LyX-Code
+
+\lang english
+If number of arguments is less than 6
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+
+\lang english
+Take the default values
+\end_layout
+
+\begin_layout LyX-Code
+
+\lang english
+Print the default values
+\end_layout
+
+\end_deeper
+\begin_layout LyX-Code
+
+\lang english
+else
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+
+\lang english
+Rewrite the values with corresponding arguments
+\end_layout
+
+\end_deeper
+\begin_layout Subsection
+Code 
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+#! usr/bin/python
+\end_layout
+
+\begin_layout Scrap
+
+import sys
+\end_layout
+
+\begin_layout Scrap
+
+from pylab import *
+\end_layout
+
+\begin_layout Scrap
+
+from scipy import *
+\end_layout
+
+\begin_layout Scrap
+
+from matplotlib.pylab import *
+\end_layout
+
+\begin_layout Scrap
+
+import numpy as np
+\end_layout
+
+\begin_layout Scrap
+
+import mpl_toolkits.mplot3d.axes3d as p3
+\end_layout
+
+\begin_layout Scrap
+
+from matplotlib.mlab import *
+\end_layout
+
+\begin_layout Scrap
+
+from scipy.linalg import lstsq
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now, we facilitate taking arguements from the command line and account for
+ erraneous input.
+ We also declare our vector arrays with all zeroes.
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+<<declaration>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+if len(sys.argv)<=5:
+\end_layout
+
+\begin_layout Scrap
+
+    print '
+\backslash
+n Default values:
+\backslash
+n Nx=25
+\backslash
+n Ny=25
+\backslash
+n Nbegin=8
+\backslash
+n Nend=17
+\backslash
+n Niter=1500
+\backslash
+n'
+\end_layout
+
+\begin_layout Scrap
+
+    Nx=30                       # size along x
+\end_layout
+
+\begin_layout Scrap
+
+    Ny=30                       # size along y
+\end_layout
+
+\begin_layout Scrap
+
+    Nbegin=8                    # start of electrode on each side
+\end_layout
+
+\begin_layout Scrap
+
+    Nend=17                     # end of electrode on each side
+\end_layout
+
+\begin_layout Scrap
+
+    Niter=1500                  # number of iterations to perform
+\end_layout
+
+\begin_layout Scrap
+
+elif len(sys.argv)==6:
+\end_layout
+
+\begin_layout Scrap
+
+    Nx=int(sys.argv[1])
+\end_layout
+
+\begin_layout Scrap
+
+    Ny=int(sys.argv[2])
+\end_layout
+
+\begin_layout Scrap
+
+    Nbegin=int(sys.argv[3])
+\end_layout
+
+\begin_layout Scrap
+
+    Nend=int(sys.argv[4])
+\end_layout
+
+\begin_layout Scrap
+
+    Niter=int(sys.argv[5])
+\end_layout
+
+\begin_layout Scrap
+
+           
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Section
+Runsim
+\end_layout
+
+\begin_layout Standard
+
+\lang english
+A zero matrix of order 
+\begin_inset Formula $30$
+\end_inset
+
+x30(by default) is created and its regions are marked and initial values
+ of the matrix 
+\begin_inset Formula $\Phi$
+\end_inset
+
+(named as phi in the code) are initialized using the code.The function is
+ defined such that it updates the matrix 
+\begin_inset Formula $\Phi$
+\end_inset
+
+ and also gives out the error matrix.
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+Pseudo code
+\end_layout
+
+\begin_layout LyX-Code
+
+\lang english
+Define a function which takes the values of the corresponding elements and
+ returns phi, values of errors, Jx, Jy, Iavg and Idiff
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+Python Code
+\end_layout
+
+\begin_layout Scrap
+
+<<runsim>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+def runsim(Nx,Ny,Nbegin,Nend,Niter):
+\end_layout
+
+\begin_layout Scrap
+
+    phi = zeros((Ny,Nx))		# declare potential array
+\end_layout
+
+\begin_layout Scrap
+
+    phi[0,1:-1] = 1				# top boundary
+\end_layout
+
+\begin_layout Scrap
+
+    phi[-1,1:-1] = 2			# bottom boundary
+\end_layout
+
+\begin_layout Scrap
+
+    phi[1:-1,0] = 3				# left boundary
+\end_layout
+
+\begin_layout Scrap
+
+    phi[1:-1,-1] = 4			# right boundary
+\end_layout
+
+\begin_layout Scrap
+
+    phi[0,Nbegin:(Nend+1)] = 5	# positive electrode
+\end_layout
+
+\begin_layout Scrap
+
+    phi[-1,Nbegin:(Nend+1)] = 6	# negative electrode
+\end_layout
+
+\begin_layout Scrap
+
+    phi[1:-1,1] = -3			# left adjacent
+\end_layout
+
+\begin_layout Scrap
+
+    phi[1:-1,-2] = -4			# right adjacent
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Extracting coordinates
+\end_layout
+
+\begin_layout Scrap
+
+    yb3,xb3 = where(phi==3)
+\end_layout
+
+\begin_layout Scrap
+
+    yb4,xb4 = where(phi==4)
+\end_layout
+
+\begin_layout Scrap
+
+    ya3,xa3 = where(phi==-3)
+\end_layout
+
+\begin_layout Scrap
+
+    ya4,xa4 = where(phi==-4)
+\end_layout
+
+\begin_layout Scrap
+
+        
+\end_layout
+
+\begin_layout Scrap
+
+    phi[1,1:-1] = -1			# top adjacent
+\end_layout
+
+\begin_layout Scrap
+
+    phi[-2,1:-1] = -2			# bottom adjacent
+\end_layout
+
+\begin_layout Scrap
+
+    phi[1,Nbegin:(Nend+1)] = 0	# positive electrode adjacent
+\end_layout
+
+\begin_layout Scrap
+
+    phi[-2,Nbegin:(Nend+1)] = 0	# negative electrode adjacent
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+    # Extracting coordinates
+\end_layout
+
+\begin_layout Scrap
+
+    yb1,xb1 = where(phi==1)
+\end_layout
+
+\begin_layout Scrap
+
+    yb2,xb2 = where(phi==2)
+\end_layout
+
+\begin_layout Scrap
+
+    ya1,xa1 = where(phi==-1)
+\end_layout
+
+\begin_layout Scrap
+
+    ya2,xa2 = where(phi==-2)
+\end_layout
+
+\begin_layout Scrap
+
+    ye1,xe1 = where(phi==5)
+\end_layout
+
+\begin_layout Scrap
+
+    ye0,xe0 = where(phi==6)
+\end_layout
+
+\begin_layout Scrap
+
+    
+\end_layout
+
+\begin_layout Scrap
+
+    phi[:,:] = 0				# Reset the potential arrary
+\end_layout
+
+\begin_layout Scrap
+
+    phi[ye1,xe1] = 1 			# positive potential
+\end_layout
+
+\begin_layout Scrap
+
+    errors=[]
+\end_layout
+
+\begin_layout Scrap
+
+    error=[]
+\end_layout
+
+\begin_layout Scrap
+
+    all_errors=[]	
+\end_layout
+
+\begin_layout Scrap
+
+    
+\end_layout
+
+\begin_layout Scrap
+
+    for k in range(Niter):
+\end_layout
+
+\begin_layout Scrap
+
+        # Copy phi
+\end_layout
+
+\begin_layout Scrap
+
+        oldphi=phi.copy()
+\end_layout
+
+\begin_layout Scrap
+
+        # Each non-border element is the average of the elements around
+ it
+\end_layout
+
+\begin_layout Scrap
+
+        phi[1:-1,1:-1]=0.25*(phi[1:-1,:-2]+ phi[1:-1,2:]+phi[:-2,1:-1]+phi[2:,1:-
+1])
+\end_layout
+
+\begin_layout Scrap
+
+        # Boundary Conditions
+\end_layout
+
+\begin_layout Scrap
+
+        phi[yb1,xb1]=phi[ya1,xa1]
+\end_layout
+
+\begin_layout Scrap
+
+        phi[yb2,xb2]=phi[ya2,xa2]
+\end_layout
+
+\begin_layout Scrap
+
+        phi[yb3,xb3]=phi[ya3,xa3]
+\end_layout
+
+\begin_layout Scrap
+
+        phi[yb4,xb4]=phi[ya4,xa4]
+\end_layout
+
+\begin_layout Scrap
+
+        # Calculating Max error
+\end_layout
+
+\begin_layout Scrap
+
+        err=abs(phi-oldphi).max()
+\end_layout
+
+\begin_layout Scrap
+
+        all_errors.append(err)
+\end_layout
+
+\begin_layout Scrap
+
+        if k%50==0:
+\end_layout
+
+\begin_layout Scrap
+
+            errors.append(err)
+\end_layout
+
+\begin_layout Scrap
+
+            if k>=500:
+\end_layout
+
+\begin_layout Scrap
+
+                error.append(err)
+\end_layout
+
+\begin_layout Scrap
+
+    # Calculating Jx and Jy 
+\end_layout
+
+\begin_layout Scrap
+
+    Jx=zeros((Ny,Nx))
+\end_layout
+
+\begin_layout Scrap
+
+    Jy=zeros((Ny,Nx))
+\end_layout
+
+\begin_layout Scrap
+
+    Jx[1:Ny-1,1:Nx-1]=0.5*(phi[1:Ny-1,0:Nx-2]-phi[1:Ny-1,2:Nx])
+\end_layout
+
+\begin_layout Scrap
+
+    Jy[1:Ny-1,1:Nx-1]=0.5*(phi[0:Ny-2,1:Nx-1]-phi[2:Ny,1:Nx-1])
+\end_layout
+
+\begin_layout Scrap
+
+    return phi, errors, error, all_errors, Jx, Jy
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+The main function which calls Runsim is declared below.
+\end_layout
+
+\begin_layout Scrap
+
+<<main>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+f=runsim(Nx,Ny,Nbegin,Nend,Niter)
+\end_layout
+
+\begin_layout Scrap
+
+# Allocating values
+\end_layout
+
+\begin_layout Scrap
+
+phi=f[0]
+\end_layout
+
+\begin_layout Scrap
+
+errors=f[1]
+\end_layout
+
+\begin_layout Scrap
+
+error=asarray(f[2])
+\end_layout
+
+\begin_layout Scrap
+
+all_errors=asarray(f[3])
+\end_layout
+
+\begin_layout Scrap
+
+Jx=f[4]
+\end_layout
+
+\begin_layout Scrap
+
+# Calculating Ienter, Iexit, Iavg, Idiff
+\end_layout
+
+\begin_layout Scrap
+
+Jy=f[5]
+\end_layout
+
+\begin_layout Scrap
+
+Ienter = sum(Jy[1,:])
+\end_layout
+
+\begin_layout Scrap
+
+Iexit = sum(Jy[-2,:])
+\end_layout
+
+\begin_layout Scrap
+
+Iavg = 0.5*(Ienter + Iexit)
+\end_layout
+
+\begin_layout Scrap
+
+Idiff = abs(Ienter - Iexit)
+\end_layout
+
+\begin_layout Scrap
+
+# The X axis
+\end_layout
+
+\begin_layout Scrap
+
+x=np.asarray(range(len(all_errors)))
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Section
+The plot
+\end_layout
+
+\begin_layout Subsection
+Semilog plot
+\end_layout
+
+\begin_layout Scrap
+
+<<semilog>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# Semilogy Plot with the best fits both for linear and exponential zone
+\end_layout
+
+\begin_layout Scrap
+
+figure(1)
+\end_layout
+
+\begin_layout Scrap
+
+semilogy(x[::50],all_errors[::50],'ro')
+\end_layout
+
+\begin_layout Scrap
+
+x=x.reshape(len(x),1)
+\end_layout
+
+\begin_layout Scrap
+
+x=hstack((ones((len(x),1)),x))
+\end_layout
+
+\begin_layout Scrap
+
+all_errors=all_errors.reshape(len(all_errors),1)
+\end_layout
+
+\begin_layout Scrap
+
+p,resid,rank,sig=lstsq(x,log(all_errors))
+\end_layout
+
+\begin_layout Scrap
+
+semilogy(x,exp(p[0][0]+p[1][0]*x),'b')
+\end_layout
+
+\begin_layout Scrap
+
+K=arange(500,Niter,step=50)
+\end_layout
+
+\begin_layout Scrap
+
+K=K.reshape(len(K),1)
+\end_layout
+
+\begin_layout Scrap
+
+K=hstack((ones((len(K),1)),K))
+\end_layout
+
+\begin_layout Scrap
+
+error=error.reshape(len(error),1)
+\end_layout
+
+\begin_layout Scrap
+
+p,resid,rank,sig=lstsq(K,log(error))
+\end_layout
+
+\begin_layout Scrap
+
+semilogy(K,exp(p[0][0]+p[1][0]*K*log(e)),'k')
+\end_layout
+
+\begin_layout Scrap
+
+legend(('error','fit1','fit2'))
+\end_layout
+
+\begin_layout Scrap
+
+xlabel('No.
+ of iterations $k$')
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r'$log(error)$')
+\end_layout
+
+\begin_layout Scrap
+
+title(r"Evolution of error with iteration")
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection
+
+3D-surface plot
+\end_layout
+
+\begin_layout Scrap
+
+<<3Dcountour>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# The 3D contour plot as given in the pdf
+\end_layout
+
+\begin_layout Scrap
+
+fig=figure(2)		# open a new figure
+\end_layout
+
+\begin_layout Scrap
+
+ax=p3.Axes3D(fig) 	# Axes3D is the means to do a surface plot
+\end_layout
+
+\begin_layout Scrap
+
+xx=range(Nx)  	    # create x and y axes
+\end_layout
+
+\begin_layout Scrap
+
+yy=range(Ny)
+\end_layout
+
+\begin_layout Scrap
+
+X,Y=meshgrid(xx,yy) # creates arrays out of x and y
+\end_layout
+
+\begin_layout Scrap
+
+title('The 3-D surface plot of the potential')
+\end_layout
+
+\begin_layout Scrap
+
+surf = ax.plot_surface(Y, X, phi, rstride=1, cstride=1, cmap=cm.jet)
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection
+
+Quiver plot of J
+\end_layout
+
+\begin_layout Scrap
+
+<<Quiver>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# Quiver plot of Jx and Jy
+\end_layout
+
+\begin_layout Scrap
+
+figure(4)
+\end_layout
+
+\begin_layout Scrap
+
+quiver(yy,xx,Jy.transpose(),Jx.transpose())
+\end_layout
+
+\begin_layout Scrap
+
+title(r"Vector plot of the current flow")
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection
+
+Calculating for Resistance lengths
+\end_layout
+
+\begin_layout Scrap
+
+<<reslen>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# Empty matrices for the Current and the resistance size
+\end_layout
+
+\begin_layout Scrap
+
+Imatrix=[]
+\end_layout
+
+\begin_layout Scrap
+
+Nymatrix=[]
+\end_layout
+
+\begin_layout Scrap
+
+# Perform 15000 iterations on each resistor length
+\end_layout
+
+\begin_layout Scrap
+
+for i in range(6):
+\end_layout
+
+\begin_layout Scrap
+
+    print "Simulating for Ny=%d, 15000 iterations"%(Ny)
+\end_layout
+
+\begin_layout Scrap
+
+    Jy = runsim(Nx,Ny,Nbegin,Nend,Niter=15000)[5]
+\end_layout
+
+\begin_layout Scrap
+
+    Ienter = sum(Jy[1,:])
+\end_layout
+
+\begin_layout Scrap
+
+    Iexit = sum(Jy[-2,:])
+\end_layout
+
+\begin_layout Scrap
+
+    Iavg = 0.5*(Ienter + Iexit)
+\end_layout
+
+\begin_layout Scrap
+
+    # Store Avg I and Ny
+\end_layout
+
+\begin_layout Scrap
+
+    Imatrix.append(Iavg)
+\end_layout
+
+\begin_layout Scrap
+
+    Nymatrix.append(Ny)
+\end_layout
+
+\begin_layout Scrap
+
+    Ny+=10
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection
+
+Best fit exponential and Error plotting
+\end_layout
+
+\begin_layout Scrap
+
+<<reslen_plot>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plot the discrete points of Avg I at Ny and also
+\end_layout
+
+\begin_layout Scrap
+
+# plot the best fit equation
+\end_layout
+
+\begin_layout Scrap
+
+figure(5)
+\end_layout
+
+\begin_layout Scrap
+
+plot(Nymatrix,Imatrix,'ro')
+\end_layout
+
+\begin_layout Scrap
+
+Nymatrix = array(Nymatrix).reshape((6,-1))
+\end_layout
+
+\begin_layout Scrap
+
+Imatrix = array(Imatrix).reshape((6,-1))
+\end_layout
+
+\begin_layout Scrap
+
+logNy = log(Nymatrix)
+\end_layout
+
+\begin_layout Scrap
+
+MlogNy = hstack((ones_like(logNy),logNy))
+\end_layout
+
+\begin_layout Scrap
+
+logI = log(Imatrix)
+\end_layout
+
+\begin_layout Scrap
+
+p = lstsq(MlogNy,logI)[0]
+\end_layout
+
+\begin_layout Scrap
+
+exp = e**p[0]
+\end_layout
+
+\begin_layout Scrap
+
+alphath = p[1]
+\end_layout
+
+\begin_layout Scrap
+
+Ith = exp*(Nymatrix**alphath)
+\end_layout
+
+\begin_layout Scrap
+
+plot(Nymatrix,Ith,'k')	
+\end_layout
+
+\begin_layout Scrap
+
+show()
+\end_layout
+
+\begin_layout Scrap
+
+@
+\end_layout
+
+\begin_layout Standard
+We will now list the figures that we have simulated for the default case
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename bestfit.png
+	scale 60
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Error and best fit
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename surface.png
+	scale 30
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+3D contour plot
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Error and 3D Plots
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename contour.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Contour plot of 
+\begin_inset Formula $\phi$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename quiver.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Quiver plot of 
+\begin_inset Formula $J$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Coutour and Quiver plots
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename error.png
+	scale 60
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Position plot
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Error plot with Resistance length and exponential best fit
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

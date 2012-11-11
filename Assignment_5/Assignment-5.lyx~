@@ -1,0 +1,2753 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass literate-article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 1.25cm
+\topmargin 1.25cm
+\rightmargin 1.25cm
+\bottommargin 1.5cm
+\headheight 1.25cm
+\headsep 1.25cm
+\footskip 1.25cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Spice - Circuit Analyzer
+\begin_inset Newline newline
+\end_inset
+
+Assignment-5
+\end_layout
+
+\begin_layout Author
+Swapnil Basak
+\begin_inset Newline newline
+\end_inset
+
+EE11B122
+\begin_inset Newline newline
+\end_inset
+
+IIT Madras
+\end_layout
+
+\begin_layout Part*
+Abstract
+\end_layout
+
+\begin_layout Standard
+This report briefly discusses and demonstrates circuit logic, hash tables,
+ text parsing and nodal analysis with C.
+ The problem statement is to make a doubly linked list to store information
+ about each electrical component provided.
+ This has to be done from a text file.
+ It then forms the Conductance and the Current matrices.
+\end_layout
+
+\begin_layout Part*
+Code/Documentaion:
+\end_layout
+
+\begin_layout Standard
+First we code in the routine header files,
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+#include <stdlib.h> 
+\end_layout
+
+\begin_layout Scrap
+
+#include <stdio.h> 
+\end_layout
+
+\begin_layout Scrap
+
+#include <string.h> 
+\end_layout
+
+\begin_layout Scrap
+
+#include <math.h>
+\end_layout
+
+\begin_layout Scrap
+
+#include <complex.h>
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+#define BUFLEN 256
+\end_layout
+
+\begin_layout Scrap
+
+@
+\end_layout
+
+\begin_layout Standard
+Next, the datatype and variable decalarations:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// The node structure
+\end_layout
+
+\begin_layout Scrap
+
+typedef struct node
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+  struct node *prev;
+\end_layout
+
+\begin_layout Scrap
+
+  struct node *next;
+\end_layout
+
+\begin_layout Scrap
+
+  // Node names cannot excede 5 characters
+\end_layout
+
+\begin_layout Scrap
+
+  char n1[5],n2[5],n3[5],n4[5];
+\end_layout
+
+\begin_layout Scrap
+
+  char *depname,name[3];
+\end_layout
+
+\begin_layout Scrap
+
+  float value;
+\end_layout
+
+\begin_layout Scrap
+
+}Node;
+\end_layout
+
+\begin_layout Scrap
+
+struct hash_frag
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+  char node_name[6];
+\end_layout
+
+\begin_layout Scrap
+
+  int index;
+\end_layout
+
+\begin_layout Scrap
+
+};
+\end_layout
+
+\begin_layout Scrap
+
+// Global declarations
+\end_layout
+
+\begin_layout Scrap
+
+FILE *fp;
+\end_layout
+
+\begin_layout Scrap
+
+char buf[BUFLEN]; // holds line
+\end_layout
+
+\begin_layout Scrap
+
+char *name,*power;
+\end_layout
+
+\begin_layout Scrap
+
+char *word,*pbuf;
+\end_layout
+
+\begin_layout Scrap
+
+char *a[6];
+\end_layout
+
+\begin_layout Scrap
+
+int i,j,n,row;
+\end_layout
+
+\begin_layout Scrap
+
+int sizeofimp_mat;
+\end_layout
+
+\begin_layout Scrap
+
+struct hash_frag hash_table[50];
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@ 
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Standard
+We also add the function declarations:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// function declarations
+\end_layout
+
+\begin_layout Scrap
+
+void make_hash_table(Node*);
+\end_layout
+
+\begin_layout Scrap
+
+void read(char**);
+\end_layout
+
+\begin_layout Scrap
+
+double set_exp(char*);		
+\end_layout
+
+\begin_layout Scrap
+
+void print(Node*);
+\end_layout
+
+\begin_layout Scrap
+
+void delete(Node*);
+\end_layout
+
+\begin_layout Scrap
+
+int impedance(char*);
+\end_layout
+
+\begin_layout Scrap
+
+int cccs_ccvs(char*);
+\end_layout
+
+\begin_layout Scrap
+
+int vccs_vcvs(char*);
+\end_layout
+
+\begin_layout Scrap
+
+void generate_matrix(int,int,Node*,int);
+\end_layout
+
+\begin_layout Scrap
+
+int find_hash(char*);
+\end_layout
+
+\begin_layout Scrap
+
+ 
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Our Main function:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+int main(int argc,char **argv) 
+\end_layout
+
+\begin_layout Scrap
+
+{	   
+\end_layout
+
+\begin_layout Scrap
+
+if( argc<2 )      
+\begin_inset Newline newline
+\end_inset
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+      printf("Usage: ./a.out filename
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+  	exit(1);     
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+  read(argv);
+\end_layout
+
+\begin_layout Scrap
+
+  return(1);
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\begin_inset Newline newline
+\end_inset
+
+@
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The main parser function is now written.
+ It first parses a text file for information on the circuit and then converts
+ verbose inputs to numerical ones.
+ A restriction on the number of characters that a node can contain is restricted
+(=5).
+ This module mainly improves UI and allows for quick and readable input..
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// Main parser
+\end_layout
+
+\begin_layout Scrap
+
+void read(char **argv) 
+\end_layout
+
+\begin_layout Scrap
+
+{ 
+\end_layout
+
+\begin_layout Scrap
+
+fp=fopen(argv[1],"r"); 
+\end_layout
+
+\begin_layout Scrap
+
+Node *head=(Node*)malloc(sizeof(Node));
+\end_layout
+
+\begin_layout Scrap
+
+head=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+// Read till EOF
+\end_layout
+
+\begin_layout Scrap
+
+while(fgets(buf,BUFLEN-1,fp))
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+for( n=0,pbuf=buf ; n<100 ; n++ )
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if( (word=strtok(pbuf," 
+\backslash
+t
+\backslash
+n")) == NULL )
+\end_layout
+
+\begin_layout Scrap
+
+break;
+\end_layout
+
+\begin_layout Scrap
+
+a[n]=malloc(sizeof(word)); 
+\end_layout
+
+\begin_layout Scrap
+
+a[n]=word;
+\end_layout
+
+\begin_layout Scrap
+
+// pbuf needs to be NULL on after first call of strtok
+\end_layout
+
+\begin_layout Scrap
+
+pbuf=NULL; 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+Node *node_buf=(Node*)malloc(sizeof(Node));
+\end_layout
+
+\begin_layout Scrap
+
+// Name of the element
+\end_layout
+
+\begin_layout Scrap
+
+name=malloc(sizeof(a[0]));
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->next=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+// Check if this the first node
+\end_layout
+
+\begin_layout Scrap
+
+if(!head)
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->prev=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+else
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->prev=head;
+\end_layout
+
+\begin_layout Scrap
+
+head->next=node_buf;
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+name=a[0];
+\end_layout
+
+\begin_layout Scrap
+
+// Check if atof[0] exists or it is a string
+\end_layout
+
+\begin_layout Scrap
+
+if(atof(a[1])>=0&&atof(a[2])>=0)
+\end_layout
+
+\begin_layout Scrap
+
+{ 
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->n1,a[1]);
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->n2,a[2]);
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+else
+\end_layout
+
+\begin_layout Scrap
+
+printf("Negative indexes not supported"); 
+\end_layout
+
+\begin_layout Scrap
+
+// Check for type of dependence - current or voltage
+\end_layout
+
+\begin_layout Scrap
+
+if(vccs_vcvs(name))
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->name,name); 
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->n3,a[3]);
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->n4,a[4]);
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->depname=" "; 
+\end_layout
+
+\begin_layout Scrap
+
+power=malloc(sizeof(a[5]));
+\end_layout
+
+\begin_layout Scrap
+
+sscanf(a[5],"%*f%s",power);
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->value=atof(a[5])*set_exp(power);
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+else if(cccs_ccvs(name))
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->name,name); 
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->n3,"-1");
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->n4,"-1");
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->depname=a[3]; 
+\end_layout
+
+\begin_layout Scrap
+
+power=malloc(sizeof(a[4])); 
+\end_layout
+
+\begin_layout Scrap
+
+sscanf(a[4],"%*f%s",power);
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->value=atof(a[4])*set_exp(power);
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+// Check if impedance
+\end_layout
+
+\begin_layout Scrap
+
+else if(impedance(name)) 
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->name,name); 
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->n3,"-1");
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(node_buf->n4,"-1");
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->depname=" ";
+\end_layout
+
+\begin_layout Scrap
+
+power=malloc(sizeof(a[3]));
+\end_layout
+
+\begin_layout Scrap
+
+sscanf(a[3],"%*f%s",power);
+\end_layout
+
+\begin_layout Scrap
+
+node_buf->value=atof(a[3])*set_exp(power);
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+else
+\end_layout
+
+\begin_layout Scrap
+
+printf("Invalid input"); 
+\end_layout
+
+\begin_layout Scrap
+
+*power=' ';
+\end_layout
+
+\begin_layout Scrap
+
+head=node_buf; 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+// Necessary end conditions
+\end_layout
+
+\begin_layout Scrap
+
+head->next=NULL;
+\end_layout
+
+\begin_layout Scrap
+
+fclose(fp);
+\end_layout
+
+\begin_layout Scrap
+
+print (head);
+\end_layout
+
+\begin_layout Scrap
+
+make_hash_table(head);
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+The Hash Table function is now written.
+ It then forms a hash table to index node names, which also accounts for
+ alphanumeric node names.
+ It then returns the respective index to part 3, which uses it to make the
+ conductance matrix.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// Makes hash table for the input
+\end_layout
+
+\begin_layout Scrap
+
+void make_hash_table(Node* node)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+Node *tmp;
+\end_layout
+
+\begin_layout Scrap
+
+tmp = node;
+\end_layout
+
+\begin_layout Scrap
+
+int len=0;
+\end_layout
+
+\begin_layout Scrap
+
+int count=0;
+\end_layout
+
+\begin_layout Scrap
+
+// Total no of elements
+\end_layout
+
+\begin_layout Scrap
+
+for(len=1;;)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+tmp=tmp->prev;
+\end_layout
+
+\begin_layout Scrap
+
+len+=1;
+\end_layout
+
+\begin_layout Scrap
+
+if(tmp->prev==NULL)
+\end_layout
+
+\begin_layout Scrap
+
+break;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+// Initialisation 
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<50;i++)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(hash_table[i].node_name,"0");
+\end_layout
+
+\begin_layout Scrap
+
+hash_table[i].index=0;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+int exists_n1=0; 
+\end_layout
+
+\begin_layout Scrap
+
+int exists_n2=0; 
+\end_layout
+
+\begin_layout Scrap
+
+tmp=node;
+\end_layout
+
+\begin_layout Scrap
+
+// hashing function
+\end_layout
+
+\begin_layout Scrap
+
+// Assign index to node name if not already present
+\end_layout
+
+\begin_layout Scrap
+
+for(j=0;j<len;j++)
+\end_layout
+
+\begin_layout Scrap
+
+{ 
+\end_layout
+
+\begin_layout Scrap
+
+if(tmp==NULL)
+\end_layout
+
+\begin_layout Scrap
+
+break; 
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<=count;i++)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(strcmp(hash_table[i].node_name,tmp->n1)==0)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+exists_n1=1;
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+if(strcmp(hash_table[i].node_name,tmp->n2)==0)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+exists_n2=1;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+if(!exists_n1)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(hash_table[count].node_name, tmp->n1);
+\end_layout
+
+\begin_layout Scrap
+
+hash_table[count].index=count;
+\end_layout
+
+\begin_layout Scrap
+
+count++;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+if(!exists_n2)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+strcpy(hash_table[count].node_name, tmp->n2);
+\end_layout
+
+\begin_layout Scrap
+
+hash_table[count].index=count; 
+\end_layout
+
+\begin_layout Scrap
+
+count++;
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+tmp=tmp->prev;
+\end_layout
+
+\begin_layout Scrap
+
+exists_n1=0;
+\end_layout
+
+\begin_layout Scrap
+
+exists_n2=0;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+// Output
+\end_layout
+
+\begin_layout Scrap
+
+printf("
+\backslash
+nGenerated Hash Table 
+\backslash
+n
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+printf("+------------------+
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<count;i++){
+\end_layout
+
+\begin_layout Scrap
+
+printf("|index=%d | name=%s|
+\backslash
+n",hash_table[i].index,hash_table[i].node_name);
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+printf("+------------------+
+\backslash
+n
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+sizeofimp_mat=count;
+\end_layout
+
+\begin_layout Scrap
+
+tmp=node;
+\end_layout
+
+\begin_layout Scrap
+
+while(tmp->prev!=NULL)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(*(tmp->name)=='V'||*(tmp->name)=='v')
+\end_layout
+
+\begin_layout Scrap
+
+count++;
+\end_layout
+
+\begin_layout Scrap
+
+tmp= tmp->prev;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+generate_matrix(count-1,sizeofimp_mat,node,1000);
+\end_layout
+
+\begin_layout Scrap
+
+}
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+Now, we write the main function that generates the conductance matrix.
+ This is main purpose of this program.
+ It calls hash_table for each element it finds and correspondingly adds
+ the value to the matrix cell.
+ It then compiles the resultant matrix with other details such as independent
+ voltage sources and current sources.
+ It outputs the Conductance Matrix and the Current Matrix in the equation
+ G*V=I, using standard sign conventions.
+ It initializes three matrices based on input size.
+ 
+\end_layout
+
+\begin_layout Itemize
+con_mat = Conductance Matrix
+\end_layout
+
+\begin_layout Itemize
+cur_mat = Current Matrix
+\end_layout
+
+\begin_layout Itemize
+imp_map = Impedance Matrix (con_mat^-1)
+\end_layout
+
+\begin_layout Enumerate
+It first forms the Impedance Matrix usind nodal analyis.
+ 
+\end_layout
+
+\begin_layout Enumerate
+It then checks for voltage sources and adds current variables correspodingly.
+ 
+\end_layout
+
+\begin_layout Enumerate
+It checks for current sources and adds them to the current matrix.
+ The above is done with the find_hash() function which returns the index
+ for the respective node_name.
+ 
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+void generate_matrix(int sizeofmat,int node_max,Node* node1,int w)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+int i,j,k;
+\end_layout
+
+\begin_layout Scrap
+
+complex **con_mat,*cur_mat,**imp_mat; 
+\end_layout
+
+\begin_layout Scrap
+
+con_mat=malloc(sizeofmat*sizeof(complex)); 
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<sizeofmat;i++)
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[i]=malloc(sizeofmat*sizeof(complex)); 
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<sizeofmat;i++) 
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+for(j=0;j<=sizeofmat-1;j++)
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[i][j]=0;
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+cur_mat=malloc(sizeofmat*sizeof(complex)); 
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<=sizeofmat-1;i++) 
+\end_layout
+
+\begin_layout Scrap
+
+*(cur_mat+i)=0;
+\end_layout
+
+\begin_layout Scrap
+
+imp_mat=malloc(node_max*sizeof(complex)); 
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<node_max;i++) 
+\end_layout
+
+\begin_layout Scrap
+
+imp_mat[i]=malloc(sizeofmat*sizeof(complex));
+\end_layout
+
+\begin_layout Scrap
+
+Node *node2=(Node*)malloc(sizeof(Node)); 
+\end_layout
+
+\begin_layout Scrap
+
+node2=node1; 
+\end_layout
+
+\begin_layout Scrap
+
+while(node1) 
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(*(node1->name)=='R'||*(node1->name)=='r')
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+j=find_hash(node1->n1);
+\end_layout
+
+\begin_layout Scrap
+
+k=find_hash(node1->n2);
+\end_layout
+
+\begin_layout Scrap
+
+imp_mat[j][k]=node1->value;
+\end_layout
+
+\begin_layout Scrap
+
+imp_mat[k][j]=node1->value; 
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+else if(*(node1->name)=='L'||*(node1->name)=='l')
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+j=find_hash(node1->n1);
+\end_layout
+
+\begin_layout Scrap
+
+k=find_hash(node1->n2);
+\end_layout
+
+\begin_layout Scrap
+
+imp_mat[j][k]=(1/I*w*node1->value);
+\end_layout
+
+\begin_layout Scrap
+
+imp_mat[k][j]=I*w*node1->value;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+else if(*(node1->name)=='C'||*(node1->name)=='c')
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+j=find_hash(node1->n1);
+\end_layout
+
+\begin_layout Scrap
+
+k=find_hash(node1->n2);
+\end_layout
+
+\begin_layout Scrap
+
+imp_mat[j][k]=1.0/(I*w*node1->value);
+\end_layout
+
+\begin_layout Scrap
+
+imp_mat[k][j]=1.0/(I*w*node1->value);
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+node1=node1->prev; 
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<node_max-1;i++) 
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+for(j=0;j<i+1;j++)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(i==j) 
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+for(k=0;k<node_max;k++)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(imp_mat[i][k]!=0) 
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[i][j]+=1.0/imp_mat[i][k]; 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+else
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(imp_mat[i][j]!=0) 
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[i][j]=-1/imp_mat[i][j]; 
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[j][i]=con_mat[i][j]; 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+else
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[i][j]=0; 
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[j][i]=0;
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+node1=node2; 
+\end_layout
+
+\begin_layout Scrap
+
+i=0;
+\end_layout
+
+\begin_layout Scrap
+
+while(node2) 
+\end_layout
+
+\begin_layout Scrap
+
+{ 
+\end_layout
+
+\begin_layout Scrap
+
+if(*(node2->name)=='V'||*(node1->name)=='v') 
+\end_layout
+
+\begin_layout Scrap
+
+{ 
+\end_layout
+
+\begin_layout Scrap
+
+j=find_hash(node2->n1);
+\end_layout
+
+\begin_layout Scrap
+
+k=find_hash(node2->n2);
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[node_max+i-1][j]=-1;
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[j][node_max+i-1]=-1;
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[node_max+i-1][k]=-1;
+\end_layout
+
+\begin_layout Scrap
+
+con_mat[k][node_max+i-1]=-1; 
+\end_layout
+
+\begin_layout Scrap
+
+cur_mat[node_max+i-1]=node2->value; 
+\end_layout
+
+\begin_layout Scrap
+
+i++;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+node2=node2->prev;
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+node2=node1;
+\end_layout
+
+\begin_layout Scrap
+
+while(node1) 
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(*(node1->name)=='I'||*(node1->name)=='i')
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+j=find_hash(node1->n1);
+\end_layout
+
+\begin_layout Scrap
+
+k=find_hash(node1->n2);
+\end_layout
+
+\begin_layout Scrap
+
+if(j<node_max-1)
+\end_layout
+
+\begin_layout Scrap
+
+cur_mat[j]+=node1->value; 
+\end_layout
+
+\begin_layout Scrap
+
+if(k<node_max-1) 
+\end_layout
+
+\begin_layout Scrap
+
+cur_mat[k]+=-1*node1->value;
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+node1=node1->prev;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+printf("The Variables are 
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<sizeofmat;i++)
+\end_layout
+
+\begin_layout Scrap
+
+{ 
+\end_layout
+
+\begin_layout Scrap
+
+if(i<node_max-1)
+\end_layout
+
+\begin_layout Scrap
+
+printf("V%d",i+1);
+\end_layout
+
+\begin_layout Scrap
+
+else
+\end_layout
+
+\begin_layout Scrap
+
+printf("I%d",i-node_max+2); 
+\end_layout
+
+\begin_layout Scrap
+
+printf(" ");
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+printf("
+\backslash
+n
+\backslash
+n"); 
+\end_layout
+
+\begin_layout Scrap
+
+printf("The Conductance Matrix: 
+\backslash
+n 
+\backslash
+n"); 
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<sizeofmat;i++)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+for(j=0;j<sizeofmat;j++)
+\end_layout
+
+\begin_layout Scrap
+
+printf("|
+\backslash
+t%4.2f+%4.2fi
+\backslash
+t",creal(con_mat[i][j]),cimag(con_mat[i][j])); 
+\end_layout
+
+\begin_layout Scrap
+
+printf("|
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+printf("
+\backslash
+n
+\backslash
+nThe Current Matrix:
+\backslash
+n
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<sizeofmat;i++)
+\end_layout
+
+\begin_layout Scrap
+
+{ 
+\end_layout
+
+\begin_layout Scrap
+
+printf("|%4.2f+%4.2fi
+\backslash
+t|
+\backslash
+n",creal(cur_mat[i]),cimag(cur_mat[i]));
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\end_layout
+
+\begin_layout Scrap
+
+printf("
+\backslash
+n
+\backslash
+n");
+\end_layout
+
+\begin_layout Scrap
+
+free(imp_mat); 
+\end_layout
+
+\begin_layout Scrap
+
+free(con_mat);
+\end_layout
+
+\begin_layout Scrap
+
+free(cur_mat);
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+We then write the function to return the hash value for a given name.
+ This is an important utility used for the main logic.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+int find_hash(char* name)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+for(i=0;i<sizeofimp_mat;i++)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(strcmp(hash_table[i].node_name,name)==0)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+return i;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+return 0;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+The main, but elementary, print and delete functions to output the details
+ of the circuit are now written.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+// Prints all the nodes  	
+\end_layout
+
+\begin_layout Scrap
+
+void print(Node* head)
+\end_layout
+
+\begin_layout Scrap
+
+{   
+\end_layout
+
+\begin_layout Scrap
+
+  Node *temp=(Node*)malloc(sizeof(Node));
+\end_layout
+
+\begin_layout Scrap
+
+  temp=head;
+\end_layout
+
+\begin_layout Scrap
+
+  // traces the link list with temp
+\end_layout
+
+\begin_layout Scrap
+
+  while(temp)
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+      if(vccs_vcvs(temp->name))
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  printf("%s %s %s %s %s %f
+\backslash
+n",temp->name,temp->n1,temp->n2,temp->n3,temp->n4,temp->value);
+\end_layout
+
+\begin_layout Scrap
+
+	}	 	
+\end_layout
+
+\begin_layout Scrap
+
+	else if(cccs_ccvs(temp->name))
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	 printf("%s %s %s %s %f
+\backslash
+n",temp->name,temp->n1,temp->n2,temp->depname,temp->value);
+\end_layout
+
+\begin_layout Scrap
+
+	}
+\end_layout
+
+\begin_layout Scrap
+
+	else if(impedance(temp->name))
+\end_layout
+
+\begin_layout Scrap
+
+	{
+\end_layout
+
+\begin_layout Scrap
+
+	  printf("%s %s %s %f
+\backslash
+n",temp->name,temp->n1,temp->n2,temp->value);
+\end_layout
+
+\begin_layout Scrap
+
+	}	 			
+\end_layout
+
+\begin_layout Scrap
+
+      temp=temp->prev;
+\end_layout
+
+\begin_layout Scrap
+
+    } 
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+// Frees memory
+\end_layout
+
+\begin_layout Scrap
+
+void delete(Node* head) 
+\end_layout
+
+\begin_layout Scrap
+
+{   
+\end_layout
+
+\begin_layout Scrap
+
+  Node *temp;
+\end_layout
+
+\begin_layout Scrap
+
+  temp=head;
+\end_layout
+
+\begin_layout Scrap
+
+  while(temp)
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+      head=temp;
+\end_layout
+
+\begin_layout Scrap
+
+      temp=temp->prev;
+\end_layout
+
+\begin_layout Scrap
+
+      free(head);
+\end_layout
+
+\begin_layout Scrap
+
+    } 	
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+This concludes the the second assignment.
+ The utility functions that we use throughout the code:
+\end_layout
+
+\begin_layout Subsection*
+Utility Functions:
+\end_layout
+
+\begin_layout Standard
+This returns a number based on verbose input by user.
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>= 
+\begin_inset Newline newline
+\end_inset
+
+// UTILITY FUNCTIONS
+\end_layout
+
+\begin_layout Scrap
+
+// Returns power based on char formatting
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+double set_exp(char *power)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+  if(*power=='n')
+\end_layout
+
+\begin_layout Scrap
+
+    return pow(10,-9);
+\end_layout
+
+\begin_layout Scrap
+
+  else if(*power=='u')
+\end_layout
+
+\begin_layout Scrap
+
+    return pow(10,-6);
+\end_layout
+
+\begin_layout Scrap
+
+  else if(!strcmp(power,"meg"))
+\end_layout
+
+\begin_layout Scrap
+
+    return pow(10,6);
+\end_layout
+
+\begin_layout Scrap
+
+  else if(*power=='k')
+\end_layout
+
+\begin_layout Scrap
+
+    return pow(10,3);
+\end_layout
+
+\begin_layout Scrap
+
+  else if(*power=='m')
+\end_layout
+
+\begin_layout Scrap
+
+    return pow(10,-3);
+\end_layout
+
+\begin_layout Scrap
+
+  else
+\end_layout
+
+\begin_layout Scrap
+
+    return 1;
+\end_layout
+
+\begin_layout Scrap
+
+	 }
+\end_layout
+
+\begin_layout Standard
+
+This checks if the element is a impedance.
+\end_layout
+
+\begin_layout Scrap
+
+// Checks for R, L, C
+\end_layout
+
+\begin_layout Scrap
+
+int impedance(char *name) 
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+if(*name=='R'||*name=='L'||*name=='V'||*name=='C'||*name=='I'||*name=='r'||*name
+=='l'||*name=='c'||*name=='v'||*name=='i')
+\end_layout
+
+\begin_layout Scrap
+
+    {
+\end_layout
+
+\begin_layout Scrap
+
+	return 1;
+\end_layout
+
+\begin_layout Scrap
+
+    }   
+\end_layout
+
+\begin_layout Scrap
+
+else return 0;   
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Standard
+This utility checks if the element is controlled by a current source.
+\end_layout
+
+\begin_layout Scrap
+
+// Checks for CCVS or CCCS
+\end_layout
+
+\begin_layout Scrap
+
+int cccs_ccvs(char *name)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+  if(*name=='H'||*name=='F'||*name=='h'||*name=='f')
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+    return 1;
+\end_layout
+
+\begin_layout Scrap
+
+  }
+\end_layout
+
+\begin_layout Scrap
+
+  else return 0;
+\end_layout
+
+\begin_layout Scrap
+
+}
+\end_layout
+
+\begin_layout Standard
+
+Similarly, this utility checks if the element is controlled by a voltage
+ source.
+\end_layout
+
+\begin_layout Scrap
+
+// Checks for VCVS or VCCS
+\end_layout
+
+\begin_layout Scrap
+
+int vccs_vcvs(char *name)
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+  if(*name=='E'||*name=='G'||*name=='e'||*name=='g')
+\end_layout
+
+\begin_layout Scrap
+
+{
+\end_layout
+
+\begin_layout Scrap
+
+    return 1;
+\end_layout
+
+\begin_layout Scrap
+
+  }
+\end_layout
+
+\begin_layout Scrap
+
+  else return 0;
+\end_layout
+
+\begin_layout Scrap
+
+} 
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Subsection*
+Sample Input:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\end_layout
+
+\begin_layout Scrap
+
+R 1a 2b 3
+\end_layout
+
+\begin_layout Scrap
+
+L 1a 3c 0.05
+\end_layout
+
+\begin_layout Scrap
+
+C 2b 3c 5
+\end_layout
+
+\begin_layout Scrap
+
+V 2b 1a 50
+\end_layout
+
+\begin_layout Scrap
+
+V 3c 1a 22
+\end_layout
+
+\begin_layout Scrap
+
+I 1a 2b 40
+\end_layout
+
+\begin_layout Scrap
+
+@
+\end_layout
+
+\begin_layout Subsection*
+Sample Output:
+\end_layout
+
+\begin_layout Scrap
+
+<<code>>=
+\begin_inset Newline newline
+\end_inset
+
+Node details : 
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+I 1a 2b 40.000000
+\end_layout
+
+\begin_layout Scrap
+
+V 3c 1a 22.000000
+\end_layout
+
+\begin_layout Scrap
+
+V 2b 1a 50.000000
+\end_layout
+
+\begin_layout Scrap
+
+C 2b 3c 5.000000
+\end_layout
+
+\begin_layout Scrap
+
+L 1a 3c 0.050000
+\end_layout
+
+\begin_layout Scrap
+
+R 1a 2b 3.000000
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
+Generated Hash Table 
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Scrap
+
++------------------+
+\end_layout
+
+\begin_layout Scrap
+
+|index=0 | name=1a|
+\end_layout
+
+\begin_layout Scrap
+
+|index=1 | name=2b|
+\end_layout
+
+\begin_layout Scrap
+
+|index=2 | name=3c|
+\end_layout
+
+\begin_layout Scrap
+
++------------------+
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+The Variables are 
+\end_layout
+
+\begin_layout Scrap
+
+V1 V2 I1 I2
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+The Conductance Matrix: 
+\end_layout
+
+\begin_layout Scrap
+
+ 
+\end_layout
+
+\begin_layout Scrap
+
+|	0.33+0.02i	 |	-0.33+0.00i	|	-1.00+0.00i	|	-1.00+0.00i	|
+\end_layout
+
+\begin_layout Scrap
+
+|	-0.33+0.00i	|	0.33+5000.00i  |	0.00+0.00i	 |	-1.00+0.00i	|
+\end_layout
+
+\begin_layout Scrap
+
+|	-1.00+0.00i	|	0.00+0.00i	 |	-1.00+0.00i	|	0.00+0.00i	 |
+\end_layout
+
+\begin_layout Scrap
+
+|	-1.00+0.00i	|	-1.00+0.00i	|	0.00+0.00i	 |	0.00+0.00i	 |
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+The Current Matrix:
+\end_layout
+
+\begin_layout Scrap
+
+|40.00+0.00i	|
+\end_layout
+
+\begin_layout Scrap
+
+|-40.00+0.00i   |
+\end_layout
+
+\begin_layout Scrap
+
+|22.00+0.00i	|
+\end_layout
+
+\begin_layout Scrap
+
+|50.00+0.00i	|
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\end_body
+\end_document

@@ -68,7 +68,7 @@
 \begin_body
 
 \begin_layout Title
-Python Assignment -2
+Python Assignment -5
 \end_layout
 
 \begin_layout Author
@@ -80,8 +80,14 @@ EE11B122, IIT Madras
 \end_layout
 
 \begin_layout Abstract
-We demonstrate the quad() function to evaluate integrals and also do error
- analysis on recursive sums using the Trapezoidal method.
+In this assignment, we solve for the currents in a resistor.
+ The currents depend on the shape of the resistor and we want to see if
+ 
+\begin_inset Formula $R=ρ\frac{L}{A}$
+\end_inset
+
+ works or not.
+ 
 \end_layout
 
 \begin_layout Section*
@@ -97,6 +103,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -105,34 +112,52 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 #! usr/bin/python
 \end_layout
 
 \begin_layout Scrap
 
+import sys
 \end_layout
 
 \begin_layout Scrap
-from scipy.integrate import quad
+
+from pylab import *
 \end_layout
 
 \begin_layout Scrap
-from scipy import linspace, cumsum, where
+
+from scipy import *
 \end_layout
 
 \begin_layout Scrap
-import matplotlib.pyplot as graph
+
+from matplotlib.pylab import *
 \end_layout
 
 \begin_layout Scrap
-import scipy.special as sp
+
+import numpy as np
 \end_layout
 
 \begin_layout Scrap
-from numpy import fabs 	
+
+import mpl_toolkits.mplot3d.axes3d as p3
 \end_layout
 
 \begin_layout Scrap
+
+from matplotlib.mlab import *
+\end_layout
+
+\begin_layout Scrap
+
+from scipy.linalg import lstsq
+\end_layout
+
+\begin_layout Scrap
+
 \begin_inset Newline newline
 \end_inset
 
@@ -140,9 +165,9 @@ from numpy import fabs
 \end_layout
 
 \begin_layout Standard
-Now, we set our constants and describe the function that the quad routine
- will use.
- We also declare the vectors that we will be using throughout this program.
+Now, we facilitate taking arguements from the command line and account for
+ erraneous input.
+ We also declare our vector arrays with all zeroes.
 \end_layout
 
 \begin_layout Scrap
@@ -150,7 +175,8 @@ Now, we set our constants and describe the function that the quad routine
 \end_layout
 
 \begin_layout Scrap
-<<program>>=
+
+<<declaration>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -158,127 +184,119 @@ Now, we set our constants and describe the function that the quad routine
 \end_layout
 
 \begin_layout Scrap
-# The function that Quad uses
-\end_layout
 
-\begin_layout Scrap
-func=lambda x: 1/(1+x**2)
-\end_layout
-
-\begin_layout Scrap
-step=0.1
-\end_layout
-
-\begin_layout Scrap
-err=1
-\end_layout
-
-\begin_layout Scrap
-counter=0
-\end_layout
-
-\begin_layout Scrap
-steps = []
+# Take arguements from command line
 \end_layout
 
 \begin_layout Scrap
 
+try:
 \end_layout
 
 \begin_layout Scrap
-samples=sp.arange(0,5+step,step)
+
+    n=int(sys.argv[1]) # spatial grid size
 \end_layout
 
 \begin_layout Scrap
-results = sp.linspace(0,0,len(samples))
+
+    M=int(sys.argv[2]) # number of electrons injected per turn
 \end_layout
 
 \begin_layout Scrap
-manual= sp.linspace(0,0,len(samples))
+
+    nk=int(sys.argv[3]) # number of turns to simulate 
 \end_layout
 
 \begin_layout Scrap
-estimated_errors, real_errors=[],[]
-\begin_inset Newline newline
-\end_inset
 
-
+    u0=int(sys.argv[4]) # threshold activity
 \end_layout
 
 \begin_layout Scrap
-@
-\end_layout
 
-\begin_layout Standard
-We then decalre the computing function that takes in two arguements and
- applie dthe 
-\begin_inset Formula $quad()$
-\end_inset
-
- routine and returns the result array.
+    p=float(sys.argv[5]) # probability that ionisation will occur
 \end_layout
 
 \begin_layout Scrap
-<<quadfunc>>=
-\begin_inset Newline newline
-\end_inset
 
-
+except:
 \end_layout
 
 \begin_layout Scrap
-def integrate(samples,results):
+
+    print "Invalid values"    
 \end_layout
 
 \begin_layout Scrap
-	for i in range(len(samples)):
+
+    n=100
 \end_layout
 
 \begin_layout Scrap
-	# Compute Results with Quad
+
+    M=5
 \end_layout
 
 \begin_layout Scrap
-	    results[i]=quad(func,0,samples[i])[0]
+
+    nk=500
 \end_layout
 
 \begin_layout Scrap
-	return results
-\begin_inset Newline newline
-\end_inset
 
-@
-\end_layout
-
-\begin_layout Standard
-We then declare the function that calculates the above integral using the
- trapezoidal step algorithm.
- It says that
+    u0=7 
 \end_layout
 
 \begin_layout Scrap
-<<cumsum>>=
-\begin_inset Newline newline
-\end_inset
 
-
+    p=0.5 
 \end_layout
 
 \begin_layout Scrap
-def series(new_samples,new_results):
+
+    print "Taking default values n=%d, M=%d, nk=%d, u0=%d, p=%f" %(n,M,nk,u0,p)
+    
 \end_layout
 
 \begin_layout Scrap
-    # Compute manually using recursive summation
+
+    
 \end_layout
 
 \begin_layout Scrap
-    new_results=step*(cumsum(func(new_samples)) - 0.5*(func(min(new_samples))+fun
-c(new_samples)))
+
+xx=zeros(n*M) # Electron Position
 \end_layout
 
 \begin_layout Scrap
-    return new_results
+
+u=zeros(n*M) # Electron Velocity
+\end_layout
+
+\begin_layout Scrap
+
+dx=zeros(n*M) # Displacement in current turn
+\end_layout
+
+\begin_layout Scrap
+
+I=[] # Intensity
+\end_layout
+
+\begin_layout Scrap
+
+X=[] # Electron position
+\end_layout
+
+\begin_layout Scrap
+
+V=[] # Electron velocity
+\end_layout
+
+\begin_layout Scrap
+
+           
 \begin_inset Newline newline
 \end_inset
 
@@ -286,478 +304,432 @@ c(new_samples)))
 \end_layout
 
 \begin_layout Standard
-Now we write another function that increases our sample size by halving
- the step interval.
- It returns a tuple both of the new sample set and result array
-\end_layout
-
-\begin_layout Scrap
-<<ftrap>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-def ftrap(oldx,oldy):
-\end_layout
-
-\begin_layout Scrap
-    # Return double of the sample size
-\end_layout
-
-\begin_layout Scrap
-    newx = sp.arange(oldx[0],oldx[-1]+(0.5)*step,0.5*step)
-\end_layout
-
-\begin_layout Scrap
-    newy = sp.linspace(0,0,len(newx))
-\end_layout
-
-\begin_layout Scrap
-    return (newx,newy)
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-Now we calculate the maximum error for common points in the old and the
- new array.
- We do this using python list slicing in steps and list comprehension.
- We also calculate the actual value of the function by evaluating our sample
- set with the inbuilt arctan function.
-\end_layout
-
-\begin_layout Scrap
-<<error>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-def error(old,new):
-\end_layout
-
-\begin_layout Scrap
-    # Return the Max absolute value
-\end_layout
-
-\begin_layout Scrap
-    if new is None:
-\end_layout
-
-\begin_layout Scrap
-        return 1
-\end_layout
-
-\begin_layout Scrap
-    new=new[::2]
-\end_layout
-
-\begin_layout Scrap
-    err = max([abs(val) for val in new-old])
-\end_layout
-
-\begin_layout Scrap
-    return err
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-results = integrate(samples,results)
-\end_layout
-
-\begin_layout Scrap
-preset = sp.arctan(samples)
-\end_layout
-
-\begin_layout Scrap
-preset_errors = [fabs(x) for x in results-preset]
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-Before we move on to minimizing error, we store the current values of the
- 
-\begin_inset Formula $quad()$
-\end_inset
-
- with the preset values of the function.
- We also plot a graph to analyze the semilogy plot of the errors between
- the 
-\begin_inset Formula $quad$
-\end_inset
-
- function and the 
-\begin_inset Formula $arctan$
-\end_inset
-
- function.
-\end_layout
-
-\begin_layout Scrap
-<<graphs_1>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-graph.figure(1)
-\end_layout
-
-\begin_layout Scrap
-graph.plot(samples,results,'ro',samples,preset,'k')
-\end_layout
-
-\begin_layout Scrap
-graph.legend(('quad fn',r'$tan^{-1}(x)$'))
-\end_layout
-
-\begin_layout Scrap
-graph.title(r'Plot of $1/(1+t^{2})$')
-\end_layout
-
-\begin_layout Scrap
-graph.xlabel(r'$x$')
-\end_layout
-
-\begin_layout Scrap
-graph.ylabel('quad fn')
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-graph.figure(2)
-\end_layout
-
-\begin_layout Scrap
-graph.semilogy(samples,preset_errors,'ro')
-\end_layout
-
-\begin_layout Scrap
-graph.xlabel(r'$x$')
-\end_layout
-
-\begin_layout Scrap
-graph.ylabel('Error')
-\end_layout
-
-\begin_layout Scrap
-graph.title(r'Error in $
-\backslash
-int_{0}^{x}dt/(1+t^{2})$')
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-results = series(samples,manual)
-\end_layout
-
-\begin_layout Scrap
-new_samples=samples
-\end_layout
-
-\begin_layout Scrap
-new_results=results
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-We now estimate the error using the method of vectors and recursive iteration.
- We state that we want an 
-\begin_inset Formula $\varepsilon$
-\end_inset
-
- < 
-\begin_inset Formula $10^{-8}$
-\end_inset
-
- or a maximium of 9 iterations.
- Each iteration, we call 
-\begin_inset Formula $ftrap()$
-\end_inset
-
- and double the sample set to increase accuracy.
- We then calculate and store two different errors - the error between common
- points and the error with the preset 
-\begin_inset Formula $arctan()$
-\end_inset
-
- function\SpecialChar \@.
-
-\end_layout
-
-\begin_layout Scrap
-<<estimate>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-# Keep doing until error is below tolerance or counter reaches 9
-\end_layout
-
-\begin_layout Scrap
-while(err>pow(10,-7)):
-\end_layout
-
-\begin_layout Scrap
-    counter+=1
-\end_layout
-
-\begin_layout Scrap
-    if counter>9:
-\end_layout
-
-\begin_layout Scrap
-        break
-\end_layout
-
-\begin_layout Scrap
-    new_samples,new_results=ftrap(samples,results)
-\end_layout
-
-\begin_layout Scrap
-    step = step/2
-\end_layout
-
-\begin_layout Scrap
-    steps.append(step)
-\end_layout
-
-\begin_layout Scrap
-    new_results = series(new_samples,new_results)
-\end_layout
-
-\begin_layout Scrap
-    if counter==1:
-\end_layout
-
-\begin_layout Scrap
-        graph.figure(3)
-\end_layout
-
-\begin_layout Scrap
-        graph.plot(new_samples,new_results,'ro',samples,preset,'k')
-\end_layout
-
-\begin_layout Scrap
-        graph.xlabel(r'$x$')
-\end_layout
-
-\begin_layout Scrap
-        graph.ylabel(r'$
-\backslash
-int_{0}^{x}
-\backslash
-frac{dt}{(1+t^{2})}$')
-\end_layout
-
-\begin_layout Scrap
-        graph.title('Integration using Trapezoidal Rule') 
-\end_layout
-
-\begin_layout Scrap
-    err = error(results,new_results)
-\end_layout
-
-\begin_layout Scrap
-    samples=new_samples
-\end_layout
-
-\begin_layout Scrap
-    results=new_results
-\end_layout
-
-\begin_layout Scrap
-    preset = sp.arctan(new_samples)
-\end_layout
-
-\begin_layout Scrap
-    real_errors.append(max([fabs(x) for x in new_results-preset]))
-\end_layout
-
-\begin_layout Scrap
-    estimated_errors.append(err)
-\end_layout
-
-\begin_layout Scrap
-    print "Running Ftrap iteration", counter 
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-Finally, we plot the loglog plot of the two different types of errors and
- we see the similarity in their nature.
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-<<graphs_2>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-graph.figure(4)
-\end_layout
-
-\begin_layout Scrap
-graph.title(r'Error in $
-\backslash
-int_{0}^{x}dt/(1+t^{2})$')
-\end_layout
-
-\begin_layout Scrap
-graph.xlabel(r'$log(x)$')
-\end_layout
-
-\begin_layout Scrap
-graph.ylabel(r'Log(Error)')
-\end_layout
-
-\begin_layout Scrap
-graph.loglog(steps,estimated_errors,'ro',steps,real_errors,'+')
-\end_layout
-
-\begin_layout Scrap
-graph.legend(('Exact error','Estimated error'))
-\end_layout
-
-\begin_layout Scrap
-graph.show()
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename quad.png
-	scale 60
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Plot of Quad with arctan
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename semilog.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Semilog plot of the error
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename Trapezoid.png
-	scale 60
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-Plot of the trapezoidal series.
- As we can see, it is remarkably accurate.
+This is our for loop.
+ We carry out several simultaneous processes here.
  
 \end_layout
 
+\begin_layout Enumerate
+We first find all electrons which are in the chamber.
+ We add their positions and velocities to the respective arrays.
+\end_layout
+
+\begin_layout Enumerate
+We check for electrons that have reached the end of the chamber and reset
+ them.
+\end_layout
+
+\begin_layout Enumerate
+We then check for electrons that have more than critical velocity and are
+ capable of ionizing the atoms
+\end_layout
+
+\begin_layout Enumerate
+We use an approximate method to find out how many such electrons will actually
+ ionize.
+\end_layout
+
+\begin_layout Enumerate
+We then update all electrons in the chamber to our arrays.
+\end_layout
+
+\begin_layout Scrap
+
+<<loop>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+for k in range(nk):
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Check for electrons which are in the chamber
+\end_layout
+
+\begin_layout Scrap
+
+	ii=where(xx>0);
+\end_layout
+
+\begin_layout Scrap
+
+	dx[ii]=u[ii]+0.5
+\end_layout
+
+\begin_layout Scrap
+
+	xx[ii]=xx[ii]+dx[ii]
+\end_layout
+
+\begin_layout Scrap
+
+	u[ii]=u[ii]+1
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Check for electrons that have reached the end
+\end_layout
+
+\begin_layout Scrap
+
+	end=where(xx>=n)
+\end_layout
+
+\begin_layout Scrap
+
+	xx[end]=0
+\end_layout
+
+\begin_layout Scrap
+
+	u[end]=0
+\end_layout
+
+\begin_layout Scrap
+
+	dx[end]=0
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Check for electrons having more than critical velocity
+\end_layout
+
+\begin_layout Scrap
+
+	active=where(u>=u0)
+\end_layout
+
+\begin_layout Scrap
+
+	ion=where(rand(len(active[0]))<=p);
+\end_layout
+
+\begin_layout Scrap
+
+	index=active[0][ion]
+\end_layout
+
+\begin_layout Scrap
+
+	u[index]=0
+\end_layout
+
+\begin_layout Scrap
+
+	xx[index]=xx[index]-rand(len(index))*dx[index]
+\end_layout
+
+\begin_layout Scrap
+
+	I.extend(xx[index].tolist())
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Random distribution of injected electrons
+\end_layout
+
+\begin_layout Scrap
+
+	pos=where(xx==0)
+\end_layout
+
+\begin_layout Scrap
+
+	if len(pos[0])<M:
+\end_layout
+
+\begin_layout Scrap
+
+	xx[pos]=1
+\end_layout
+
+\begin_layout Scrap
+
+	else:
+\end_layout
+
+\begin_layout Scrap
+
+	xx[pos[0][:randn()*2+10]]=1
+\end_layout
+
+\begin_layout Scrap
+
+	pos = where(xx>0) 
+\end_layout
+
+\begin_layout Scrap
+
+	
+\end_layout
+
+\begin_layout Scrap
+
+	# Position and velocity
+\end_layout
+
+\begin_layout Scrap
+
+	X.extend(xx[pos].tolist())
+\end_layout
+
+\begin_layout Scrap
+
+	V.extend(u[pos].tolist())
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Standard
+These are the plotting functions that plots the following:
+\end_layout
+
+\begin_layout Itemize
+Population plot of electron position.
+\end_layout
+
+\begin_layout Itemize
+Population plot of electron intensity.
+\end_layout
+
+\begin_layout Itemize
+Plot of electron's position and velocity
+\end_layout
+
+\begin_layout Itemize
+Plot off the array of the history of all positions and velocity.
+\end_layout
+
+\begin_layout Itemize
+We also form a two column matrix of intensity and electron count and store
+ it in a file.
+\end_layout
+
+\begin_layout Scrap
+
+<<plot>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# Population plot    
+\end_layout
+
+\begin_layout Scrap
+
+figure(0)
+\end_layout
+
+\begin_layout Scrap
+
+hist(X,bins=n)
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Intensity plot
+\end_layout
+
+\begin_layout Scrap
+
+figure(1)
+\end_layout
+
+\begin_layout Scrap
+
+hist(I,bins=n)
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r"x")
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r"I")
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Obtaining table from hist and saving
+\end_layout
+
+\begin_layout Scrap
+
+bins=hist(I,bins=n)[1]
+\end_layout
+
+\begin_layout Scrap
+
+xpos=(0.5)*(bins[0:-1]+bins[1:])
+\end_layout
+
+\begin_layout Scrap
+
+count=hist(I,bins=n)[0]
+\end_layout
+
+\begin_layout Scrap
+
+x=hstack((xpos.reshape((n,1)),count.reshape((n,1))))
+\end_layout
+
+\begin_layout Scrap
+
+savetxt("intensity.dat",c_[xpos,count])
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting electron phase space
+\end_layout
+
+\begin_layout Scrap
+
+figure(2)
+\end_layout
+
+\begin_layout Scrap
+
+plot(xx,u,"x")
+\end_layout
+
+\begin_layout Scrap
+
+xlabel('x')
+\end_layout
+
+\begin_layout Scrap
+
+ylabel('velocity')
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting electron phase space (TOTAL)
+\end_layout
+
+\begin_layout Scrap
+
+figure(3)
+\end_layout
+
+\begin_layout Scrap
+
+plot(X,V,"x")
+\end_layout
+
+\begin_layout Scrap
+
+xlabel('x')
+\end_layout
+
+\begin_layout Scrap
+
+ylabel('velocity')
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+show()
+\end_layout
+
+\begin_layout Scrap
+
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename error_estimate.png
+	filename position.png
+	scale 60
+	rotateOrigin center
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Position plot
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename intensity.png
 	scale 60
 
 \end_inset
@@ -766,14 +738,14 @@ Plot of the trapezoidal series.
 \end_layout
 
 \begin_layout Plain Layout
-LogLog plots
+Intensity Plot
 \end_layout
 
 \begin_layout Plain Layout
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Normal plot of the trapezoidal method and LogLog plots of the errors
+Position and Intensity Plots
 \end_layout
 
 \end_inset
@@ -783,6 +755,61 @@ Normal plot of the trapezoidal method and LogLog plots of the errors
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename elecphase.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+After simulation
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename elecphaseall.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+For all time
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Electron Phase plots
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
 
 \end_layout
 

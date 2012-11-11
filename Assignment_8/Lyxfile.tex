@@ -1,0 +1,242 @@
+\batchmode% ===> this file was generated automatically by noweave --- better not edit it
+\makeatletter
+\def\input@path{{/home/swapnil/Elec_lab/Assignment_8//}}
+\makeatother
+\documentclass[canadian]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage[pdftex,a4paper]{geometry}
+\geometry{verbose,tmargin=1.5cm,bmargin=0.5cm,lmargin=1.5cm,rmargin=1.5cm,headheight=0.5cm,headsep=0.5cm,footskip=0.5cm}
+\usepackage[active]{srcltx}
+\usepackage[pdftex]{graphicx}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+\usepackage{noweb}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{Python Assignment -2}
+
+
+\author{Swapnil Basak}
+
+
+\date{EE11B122, IIT Madras}
+\maketitle
+\begin{abstract}
+PUT ABSTRACT HERE
+\end{abstract}
+
+\section*{Program}
+
+We include the shebang and import out libraries
+
+
+\subsection*{Code}
+
+\nwfilename{Lyxfile.nw}\nwbegincode{1}\sublabel{NW2tjBIE-4CALkl-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-4CALkl-1}}}\moddef{code~{\nwtagstyle{}\subpageref{NW2tjBIE-4CALkl-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+#! usr/bin/python
+
+from scipy.integrate import quad
+from scipy import linspace, cumsum, where
+import matplotlib.pyplot as graph
+import scipy.special as sp
+from numpy import fabs  
+
+\nwnotused{code}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+\selectlanguage{canadian}%
+Now, we set our constants and describe the function that the quad
+routine will use. We also declare the vectors that we will be using
+throughout this program.
+
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2tjBIE-4eEJrA-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-4eEJrA-1}}}\moddef{program~{\nwtagstyle{}\subpageref{NW2tjBIE-4eEJrA-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+# The function that Quad uses
+func=lambda x: 1/(1+x**2)
+step=0.1
+err=1
+counter=0
+steps = []
+
+samples=sp.arange(0,5+step,step)
+results = sp.linspace(0,0,len(samples))
+manual= sp.linspace(0,0,len(samples))
+estimated_errors, real_errors=[],[]
+
+\nwnotused{program}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+\selectlanguage{canadian}%
+We then decalre the computing function that takes in two arguements
+and applie dthe $quad()$ routine and returns the result array.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2tjBIE-Nmg6T-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-Nmg6T-1}}}\moddef{quadfunc~{\nwtagstyle{}\subpageref{NW2tjBIE-Nmg6T-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+def integrate(samples,results):
+        for i in range(len(samples)):
+        # Compute Results with Quad
+            results[i]=quad(func,0,samples[i])[0]
+        return results
+\nwnotused{quadfunc}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\selectlanguage{canadian}%
+We then declare the function that calculates the above integral using
+the trapezoidal step algorithm. It says that
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2tjBIE-25UXyi-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-25UXyi-1}}}\moddef{cumsum~{\nwtagstyle{}\subpageref{NW2tjBIE-25UXyi-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+def series(new_samples,new_results):
+    # Compute manually using recursive summation
+    new_results=step*(cumsum(func(new_samples)) - 0.5*(func(min(new_samples))+func(new_samples)))
+    return new_results
+\nwnotused{cumsum}\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+\selectlanguage{canadian}%
+Now we write another function that increases our sample size by halving
+the step interval. It returns a tuple both of the new sample set and
+result array
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW2tjBIE-2vwsLi-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-2vwsLi-1}}}\moddef{ftrap~{\nwtagstyle{}\subpageref{NW2tjBIE-2vwsLi-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+def ftrap(oldx,oldy):
+    # Return double of the sample size
+    newx = sp.arange(oldx[0],oldx[-1]+(0.5)*step,0.5*step)
+    newy = sp.linspace(0,0,len(newx))
+    return (newx,newy)
+\nwnotused{ftrap}\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+\selectlanguage{canadian}%
+Now we calculate the maximum error for common points in the old and
+the new array. We do this using python list slicing in steps and list
+comprehension. We also calculate the actual value of the function
+by evaluating our sample set with the inbuilt arctan function.
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW2tjBIE-29DDmX-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-29DDmX-1}}}\moddef{error~{\nwtagstyle{}\subpageref{NW2tjBIE-29DDmX-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+def error(old,new):
+    # Return the Max absolute value
+    if new is None:
+        return 1
+    new=new[::2]
+    err = max([abs(val) for val in new-old])
+    return err
+
+
+results = integrate(samples,results)
+preset = sp.arctan(samples)
+preset_errors = [fabs(x) for x in results-preset]
+\nwnotused{error}\nwendcode{}\nwbegindocs{12}\nwdocspar
+
+\selectlanguage{canadian}%
+Before we move on to minimizing error, we store the current values
+of the $quad()$ with the preset values of the function. We also plot
+a graph to analyze the semilogy plot of the errors between the $quad$
+function and the $arctan$ function.
+
+\nwenddocs{}\nwbegincode{13}\sublabel{NW2tjBIE-mnDR7-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-mnDR7-1}}}\moddef{graphs_1~{\nwtagstyle{}\subpageref{NW2tjBIE-mnDR7-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+graph.figure(1)
+graph.plot(samples,results,'ro',samples,preset,'k')
+graph.ylabel('quad fn')
+
+graph.figure(2)
+graph.semilogy(samples,preset_errors,'ro')
+graph.ylabel('Error')
+
+results = series(samples,manual)
+new_samples=samples
+new_results=results
+\nwnotused{graphs_1}\nwendcode{}\nwbegindocs{14}\nwdocspar
+
+\selectlanguage{canadian}%
+We now estimate the error using the method of vectors and recursive
+iteration. We state that we want an $\varepsilon$ < $10^{-8}$ or
+a maximium of 9 iterations. Each iteration, we call $ftrap()$ and
+double the sample set to increase accuracy. We then calculate and
+store two different errors - the error between common points and the
+error with the preset $arctan()$ function\@.
+
+\nwenddocs{}\nwbegincode{15}\sublabel{NW2tjBIE-4VxdxU-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-4VxdxU-1}}}\moddef{estimate~{\nwtagstyle{}\subpageref{NW2tjBIE-4VxdxU-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+# Keep doing until error is below tolerance or counter reaches 9
+while(err>pow(10,-7)):
+    counter+=1
+    if counter>9:
+        break
+    new_samples,new_results=ftrap(samples,results)
+    step = step/2
+    steps.append(step)
+    new_results = series(new_samples,new_results)
+    if counter==1:
+        graph.figure(3)
+        graph.plot(new_samples,new_results,'ro',samples,preset,'k')
+        graph.title('Integration using Trapezoidal Rule') 
+    err = error(results,new_results)
+    samples=new_samples
+    results=new_results
+    preset = sp.arctan(new_samples)
+    real_errors.append(max([fabs(x) for x in new_results-preset]))
+    estimated_errors.append(err)
+    print "Running Ftrap iteration", counter 
+\nwnotused{estimate}\nwendcode{}\nwbegindocs{16}\nwdocspar
+
+\selectlanguage{canadian}%
+Finally, we plot the loglog plot of the two different types of errors
+and we see the similarity in their nature.
+
+
+\nwenddocs{}\nwbegincode{17}\sublabel{NW2tjBIE-31sfAj-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2tjBIE-31sfAj-1}}}\moddef{graphs_2~{\nwtagstyle{}\subpageref{NW2tjBIE-31sfAj-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+
+graph.figure(4)
+graph.ylabel(r'Log(Error)')
+graph.loglog(steps,estimated_errors,'ro',steps,real_errors,'+')
+graph.legend(('Exact error','Estimated error'))
+graph.show()
+\nwnotused{graphs_2}\nwendcode{}
+
+\nwixlogsorted{c}{{code}{NW2tjBIE-4CALkl-1}{\nwixd{NW2tjBIE-4CALkl-1}}}%
+\nwixlogsorted{c}{{cumsum}{NW2tjBIE-25UXyi-1}{\nwixd{NW2tjBIE-25UXyi-1}}}%
+\nwixlogsorted{c}{{error}{NW2tjBIE-29DDmX-1}{\nwixd{NW2tjBIE-29DDmX-1}}}%
+\nwixlogsorted{c}{{estimate}{NW2tjBIE-4VxdxU-1}{\nwixd{NW2tjBIE-4VxdxU-1}}}%
+\nwixlogsorted{c}{{ftrap}{NW2tjBIE-2vwsLi-1}{\nwixd{NW2tjBIE-2vwsLi-1}}}%
+\nwixlogsorted{c}{{graphs_1}{NW2tjBIE-mnDR7-1}{\nwixd{NW2tjBIE-mnDR7-1}}}%
+\nwixlogsorted{c}{{graphs_2}{NW2tjBIE-31sfAj-1}{\nwixd{NW2tjBIE-31sfAj-1}}}%
+\nwixlogsorted{c}{{program}{NW2tjBIE-4eEJrA-1}{\nwixd{NW2tjBIE-4eEJrA-1}}}%
+\nwixlogsorted{c}{{quadfunc}{NW2tjBIE-Nmg6T-1}{\nwixd{NW2tjBIE-Nmg6T-1}}}%
+\nwbegindocs{18}\nwdocspar
+
+\selectlanguage{canadian}%
+\begin{figure}
+\includegraphics[scale=0.6]{0_home_swapnil_Elec_lab_Assignment_8_quad.eps}
+
+\caption{Plot of Quad with arctan}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics{1_home_swapnil_Elec_lab_Assignment_8_semilog.eps}
+
+\caption{Semilog plot of the error}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[scale=0.6]{2_home_swapnil_Elec_lab_Assignment_8_Trapezoid.eps}
+
+Plot of the trapezoidal series. As we can see, it is remarkably accurate. 
+
+\includegraphics[scale=0.6]{3_home_swapnil_Elec_lab_Assignment_8_error_estimate.eps}
+
+LogLog plots
+
+\caption{Normal plot of the trapezoidal method and LogLog plots of the errors}
+\end{figure}
+
+\end{document}
+\nwenddocs{}

@@ -80,8 +80,8 @@ EE11B122, IIT Madras
 \end_layout
 
 \begin_layout Abstract
-We demonstrate the quad() function to evaluate integrals and also do error
- analysis on recursive sums using the Trapezoidal method.
+P
+ut abstract here
 \end_layout
 
 \begin_layout Section*
@@ -97,6 +97,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -105,6 +106,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 #! usr/bin/python
 \end_layout
 
@@ -113,26 +115,32 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 from scipy.integrate import quad
 \end_layout
 
 \begin_layout Scrap
+
 from scipy import linspace, cumsum, where
 \end_layout
 
 \begin_layout Scrap
+
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
+
 import scipy.special as sp
 \end_layout
 
 \begin_layout Scrap
+
 from numpy import fabs 	
 \end_layout
 
 \begin_layout Scrap
+
 \begin_inset Newline newline
 \end_inset
 
@@ -150,6 +158,7 @@ Now, we set our constants and describe the function that the quad routine
 \end_layout
 
 \begin_layout Scrap
+
 <<program>>=
 \begin_inset Newline newline
 \end_inset
@@ -158,26 +167,32 @@ Now, we set our constants and describe the function that the quad routine
 \end_layout
 
 \begin_layout Scrap
+
 # The function that Quad uses
 \end_layout
 
 \begin_layout Scrap
+
 func=lambda x: 1/(1+x**2)
 \end_layout
 
 \begin_layout Scrap
+
 step=0.1
 \end_layout
 
 \begin_layout Scrap
+
 err=1
 \end_layout
 
 \begin_layout Scrap
+
 counter=0
 \end_layout
 
 \begin_layout Scrap
+
 steps = []
 \end_layout
 
@@ -186,18 +201,22 @@ steps = []
 \end_layout
 
 \begin_layout Scrap
+
 samples=sp.arange(0,5+step,step)
 \end_layout
 
 \begin_layout Scrap
+
 results = sp.linspace(0,0,len(samples))
 \end_layout
 
 \begin_layout Scrap
+
 manual= sp.linspace(0,0,len(samples))
 \end_layout
 
 \begin_layout Scrap
+
 estimated_errors, real_errors=[],[]
 \begin_inset Newline newline
 \end_inset
@@ -206,6 +225,7 @@ estimated_errors, real_errors=[],[]
 \end_layout
 
 \begin_layout Scrap
+
 @
 \end_layout
 
@@ -219,6 +239,7 @@ We then decalre the computing function that takes in two arguements and
 \end_layout
 
 \begin_layout Scrap
+
 <<quadfunc>>=
 \begin_inset Newline newline
 \end_inset
@@ -227,22 +248,27 @@ We then decalre the computing function that takes in two arguements and
 \end_layout
 
 \begin_layout Scrap
+
 def integrate(samples,results):
 \end_layout
 
 \begin_layout Scrap
+
 	for i in range(len(samples)):
 \end_layout
 
 \begin_layout Scrap
+
 	# Compute Results with Quad
 \end_layout
 
 \begin_layout Scrap
+
 	    results[i]=quad(func,0,samples[i])[0]
 \end_layout
 
 \begin_layout Scrap
+
 	return results
 \begin_inset Newline newline
 \end_inset
@@ -257,6 +283,7 @@ We then declare the function that calculates the above integral using the
 \end_layout
 
 \begin_layout Scrap
+
 <<cumsum>>=
 \begin_inset Newline newline
 \end_inset
@@ -265,19 +292,23 @@ We then declare the function that calculates the above integral using the
 \end_layout
 
 \begin_layout Scrap
+
 def series(new_samples,new_results):
 \end_layout
 
 \begin_layout Scrap
+
     # Compute manually using recursive summation
 \end_layout
 
 \begin_layout Scrap
+
     new_results=step*(cumsum(func(new_samples)) - 0.5*(func(min(new_samples))+fun
 c(new_samples)))
 \end_layout
 
 \begin_layout Scrap
+
     return new_results
 \begin_inset Newline newline
 \end_inset
@@ -292,6 +323,7 @@ Now we write another function that increases our sample size by halving
 \end_layout
 
 \begin_layout Scrap
+
 <<ftrap>>=
 \begin_inset Newline newline
 \end_inset
@@ -300,22 +332,27 @@ Now we write another function that increases our sample size by halving
 \end_layout
 
 \begin_layout Scrap
+
 def ftrap(oldx,oldy):
 \end_layout
 
 \begin_layout Scrap
+
     # Return double of the sample size
 \end_layout
 
 \begin_layout Scrap
+
     newx = sp.arange(oldx[0],oldx[-1]+(0.5)*step,0.5*step)
 \end_layout
 
 \begin_layout Scrap
+
     newy = sp.linspace(0,0,len(newx))
 \end_layout
 
 \begin_layout Scrap
+
     return (newx,newy)
 \begin_inset Newline newline
 \end_inset
@@ -332,6 +369,7 @@ Now we calculate the maximum error for common points in the old and the
 \end_layout
 
 \begin_layout Scrap
+
 <<error>>=
 \begin_inset Newline newline
 \end_inset
@@ -340,30 +378,37 @@ Now we calculate the maximum error for common points in the old and the
 \end_layout
 
 \begin_layout Scrap
+
 def error(old,new):
 \end_layout
 
 \begin_layout Scrap
+
     # Return the Max absolute value
 \end_layout
 
 \begin_layout Scrap
+
     if new is None:
 \end_layout
 
 \begin_layout Scrap
+
         return 1
 \end_layout
 
 \begin_layout Scrap
+
     new=new[::2]
 \end_layout
 
 \begin_layout Scrap
+
     err = max([abs(val) for val in new-old])
 \end_layout
 
 \begin_layout Scrap
+
     return err
 \end_layout
 
@@ -376,14 +421,17 @@ def error(old,new):
 \end_layout
 
 \begin_layout Scrap
+
 results = integrate(samples,results)
 \end_layout
 
 \begin_layout Scrap
+
 preset = sp.arctan(samples)
 \end_layout
 
 \begin_layout Scrap
+
 preset_errors = [fabs(x) for x in results-preset]
 \begin_inset Newline newline
 \end_inset
@@ -411,6 +459,7 @@ Before we move on to minimizing error, we store the current values of the
 \end_layout
 
 \begin_layout Scrap
+
 <<graphs_1>>=
 \begin_inset Newline newline
 \end_inset
@@ -419,26 +468,32 @@ Before we move on to minimizing error, we store the current values of the
 \end_layout
 
 \begin_layout Scrap
+
 graph.figure(1)
 \end_layout
 
 \begin_layout Scrap
+
 graph.plot(samples,results,'ro',samples,preset,'k')
 \end_layout
 
 \begin_layout Scrap
+
 graph.legend(('quad fn',r'$tan^{-1}(x)$'))
 \end_layout
 
 \begin_layout Scrap
+
 graph.title(r'Plot of $1/(1+t^{2})$')
 \end_layout
 
 \begin_layout Scrap
+
 graph.xlabel(r'$x$')
 \end_layout
 
 \begin_layout Scrap
+
 graph.ylabel('quad fn')
 \end_layout
 
@@ -447,22 +502,27 @@ graph.ylabel('quad fn')
 \end_layout
 
 \begin_layout Scrap
+
 graph.figure(2)
 \end_layout
 
 \begin_layout Scrap
+
 graph.semilogy(samples,preset_errors,'ro')
 \end_layout
 
 \begin_layout Scrap
+
 graph.xlabel(r'$x$')
 \end_layout
 
 \begin_layout Scrap
+
 graph.ylabel('Error')
 \end_layout
 
 \begin_layout Scrap
+
 graph.title(r'Error in $
 \backslash
 int_{0}^{x}dt/(1+t^{2})$')
@@ -473,14 +533,17 @@ int_{0}^{x}dt/(1+t^{2})$')
 \end_layout
 
 \begin_layout Scrap
+
 results = series(samples,manual)
 \end_layout
 
 \begin_layout Scrap
+
 new_samples=samples
 \end_layout
 
 \begin_layout Scrap
+
 new_results=results
 \begin_inset Newline newline
 \end_inset
@@ -514,6 +577,7 @@ We now estimate the error using the method of vectors and recursive iteration.
 \end_layout
 
 \begin_layout Scrap
+
 <<estimate>>=
 \begin_inset Newline newline
 \end_inset
@@ -522,58 +586,72 @@ We now estimate the error using the method of vectors and recursive iteration.
 \end_layout
 
 \begin_layout Scrap
+
 # Keep doing until error is below tolerance or counter reaches 9
 \end_layout
 
 \begin_layout Scrap
+
 while(err>pow(10,-7)):
 \end_layout
 
 \begin_layout Scrap
+
     counter+=1
 \end_layout
 
 \begin_layout Scrap
+
     if counter>9:
 \end_layout
 
 \begin_layout Scrap
+
         break
 \end_layout
 
 \begin_layout Scrap
+
     new_samples,new_results=ftrap(samples,results)
 \end_layout
 
 \begin_layout Scrap
+
     step = step/2
 \end_layout
 
 \begin_layout Scrap
+
     steps.append(step)
 \end_layout
 
 \begin_layout Scrap
+
     new_results = series(new_samples,new_results)
 \end_layout
 
 \begin_layout Scrap
+
     if counter==1:
 \end_layout
 
 \begin_layout Scrap
+
         graph.figure(3)
 \end_layout
 
 \begin_layout Scrap
+
         graph.plot(new_samples,new_results,'ro',samples,preset,'k')
 \end_layout
 
 \begin_layout Scrap
+
         graph.xlabel(r'$x$')
 \end_layout
 
 \begin_layout Scrap
+
         graph.ylabel(r'$
 \backslash
 int_{0}^{x}
@@ -582,34 +660,42 @@ frac{dt}{(1+t^{2})}$')
 \end_layout
 
 \begin_layout Scrap
+
         graph.title('Integration using Trapezoidal Rule') 
 \end_layout
 
 \begin_layout Scrap
+
     err = error(results,new_results)
 \end_layout
 
 \begin_layout Scrap
+
     samples=new_samples
 \end_layout
 
 \begin_layout Scrap
+
     results=new_results
 \end_layout
 
 \begin_layout Scrap
+
     preset = sp.arctan(new_samples)
 \end_layout
 
 \begin_layout Scrap
+
     real_errors.append(max([fabs(x) for x in new_results-preset]))
 \end_layout
 
 \begin_layout Scrap
+
     estimated_errors.append(err)
 \end_layout
 
 \begin_layout Scrap
+
     print "Running Ftrap iteration", counter 
 \begin_inset Newline newline
 \end_inset
@@ -627,6 +713,7 @@ Finally, we plot the loglog plot of the two different types of errors and
 \end_layout
 
 \begin_layout Scrap
+
 <<graphs_2>>=
 \begin_inset Newline newline
 \end_inset
@@ -635,32 +722,39 @@ Finally, we plot the loglog plot of the two different types of errors and
 \end_layout
 
 \begin_layout Scrap
+
 graph.figure(4)
 \end_layout
 
 \begin_layout Scrap
+
 graph.title(r'Error in $
 \backslash
 int_{0}^{x}dt/(1+t^{2})$')
 \end_layout
 
 \begin_layout Scrap
+
 graph.xlabel(r'$log(x)$')
 \end_layout
 
 \begin_layout Scrap
+
 graph.ylabel(r'Log(Error)')
 \end_layout
 
 \begin_layout Scrap
+
 graph.loglog(steps,estimated_errors,'ro',steps,real_errors,'+')
 \end_layout
 
 \begin_layout Scrap
+
 graph.legend(('Exact error','Estimated error'))
 \end_layout
 
 \begin_layout Scrap
+
 graph.show()
 \begin_inset Newline newline
 \end_inset

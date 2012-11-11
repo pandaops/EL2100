@@ -80,7 +80,8 @@ EE11B122, IIT Madras
 \end_layout
 
 \begin_layout Abstract
-Put abstract here.
+We will concentrate on reading in data, analyzing them, manipulating them
+ and studying the effects of varying levels of noise added to signals.
 \end_layout
 
 \begin_layout Section*
@@ -96,6 +97,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -104,6 +106,7 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 #! usr/bin/python
 \end_layout
 
@@ -112,30 +115,37 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 from scipy import *
 \end_layout
 
 \begin_layout Scrap
+
 import sys
 \end_layout
 
 \begin_layout Scrap
+
 import matplotlib.pyplot as graph
 \end_layout
 
 \begin_layout Scrap
+
 import scipy.special as sp
 \end_layout
 
 \begin_layout Scrap
+
 from scipy.linalg import lstsq
 \end_layout
 
 \begin_layout Scrap
+
 import numpy as np
 \end_layout
 
 \begin_layout Scrap
+
 \begin_inset Newline newline
 \end_inset
 
@@ -152,6 +162,7 @@ Now, we set our constants and load the fitting.dat file.
 \end_layout
 
 \begin_layout Scrap
+
 <<program>>=
 \begin_inset Newline newline
 \end_inset
@@ -160,19 +171,23 @@ Now, we set our constants and load the fitting.dat file.
 \end_layout
 
 \begin_layout Scrap
+
 A = 1
 \end_layout
 
 \begin_layout Scrap
+
 B = -0.02546303
 \end_layout
 
 \begin_layout Scrap
+
 # 2.
  loading file and reshaping
 \end_layout
 
 \begin_layout Scrap
+
 L = loadtxt('fitting.dat'.unpack=True)
 \begin_inset Newline newline
 \end_inset
@@ -185,6 +200,7 @@ We then declare the computing function to see the amount of noise added.
 \end_layout
 
 \begin_layout Scrap
+
 <<function>>=
 \begin_inset Newline newline
 \end_inset
@@ -193,27 +209,33 @@ We then declare the computing function to see the amount of noise added.
 \end_layout
 
 \begin_layout Scrap
+
 # 4.
  Declare the function g and compute
 \end_layout
 
 \begin_layout Scrap
+
 def g(t,a,b):
 \end_layout
 
 \begin_layout Scrap
+
         g = a*sp.jn(2,t) + b*t 
 \end_layout
 
 \begin_layout Scrap
+
         return g;
 \end_layout
 
 \begin_layout Scrap
+
 real_values = g(L[0],A,B).reshape(101,-1)
 \end_layout
 
 \begin_layout Scrap
+
         
 \begin_inset Newline newline
 \end_inset
@@ -227,6 +249,7 @@ We then plot the graph denoting the various levels of noise.
 \end_layout
 
 \begin_layout Scrap
+
 <<noise>>=
 \begin_inset Newline newline
 \end_inset
@@ -235,41 +258,50 @@ We then plot the graph denoting the various levels of noise.
 \end_layout
 
 \begin_layout Scrap
+
 # 3.
  Plotting with varying levels of noise
 \end_layout
 
 \begin_layout Scrap
+
 graph.figure(1)
 \end_layout
 
 \begin_layout Scrap
+
 graph.xlabel('$t$')
 \end_layout
 
 \begin_layout Scrap
+
 graph.ylabel('$F_
 \backslash
 sigma$')
 \end_layout
 
 \begin_layout Scrap
+
 for i in range(1,9,2):
 \end_layout
 
 \begin_layout Scrap
+
     graph.plot(L[0],L[i],'+')
 \end_layout
 
 \begin_layout Scrap
+
     graph.plot(L[0],L[i+1],'.')
 \end_layout
 
 \begin_layout Scrap
+
 graph.plot(L[0],real_values,'k')
 \end_layout
 
 \begin_layout Scrap
+
 graph.legend(('$log(
 \backslash
 sigma) = -1$','$log(
@@ -280,6 +312,7 @@ sigma) = 0$',
 \end_layout
 
 \begin_layout Scrap
+
 '$log(
 \backslash
 sigma) = 0.5$','$log(
@@ -292,6 +325,7 @@ sigma) = 2$',
 \end_layout
 
 \begin_layout Scrap
+
 '$log(
 \backslash
 sigma) = 2.5$','$log(
@@ -309,6 +343,7 @@ Now we write another method to calculate the value of G through matrices.
 \end_layout
 
 \begin_layout Scrap
+
 <<matrix>>=
 \begin_inset Newline newline
 \end_inset
@@ -317,31 +352,38 @@ Now we write another method to calculate the value of G through matrices.
 \end_layout
 
 \begin_layout Scrap
+
 # 5.
  Compute G with the matrix method
 \end_layout
 
 \begin_layout Scrap
+
 j = sp.jn(2,L[0])
 \end_layout
 
 \begin_layout Scrap
+
 M = c_[j,L[0]]
 \end_layout
 
 \begin_layout Scrap
+
 AB = [[A],[B]]
 \end_layout
 
 \begin_layout Scrap
+
 g_alt = dot(M,AB)
 \end_layout
 
 \begin_layout Scrap
+
 if all(g_alt)==all(real_values):
 \end_layout
 
 \begin_layout Scrap
+
     print "Matrix and Algebraic methods both give equal values"
 \begin_inset Newline newline
 \end_inset
@@ -359,6 +401,7 @@ Now we calculate Epsilon(
 \end_layout
 
 \begin_layout Scrap
+
 <<error>>=
 \begin_inset Newline newline
 \end_inset
@@ -367,18 +410,22 @@ Now we calculate Epsilon(
 \end_layout
 
 \begin_layout Scrap
+
 AA=arange(0,2.1,0.1)
 \end_layout
 
 \begin_layout Scrap
+
 BB=arange(-.05,0.0025,0.0025)
 \end_layout
 
 \begin_layout Scrap
+
 epsilon = np.zeros((len(AA),len(BB)))
 \end_layout
 
 \begin_layout Scrap
+
 sum1 = 0
 \end_layout
 
@@ -387,23 +434,28 @@ sum1 = 0
 \end_layout
 
 \begin_layout Scrap
+
 # 6.
  Computing the mean squared error
 \end_layout
 
 \begin_layout Scrap
+
 for a in range(len(AA)):
 \end_layout
 
 \begin_layout Scrap
+
         for b in range(len(BB)):
 \end_layout
 
 \begin_layout Scrap
+
                 epsilon[a][b]=sum((L[1] - g(L[0],AA[a],BB[b]))**2)
 \end_layout
 
 \begin_layout Scrap
+
 epsilon/=101
 \begin_inset Newline newline
 \end_inset
@@ -417,6 +469,7 @@ Once we have the Epsilon plot, we plot it's contour plot to analyze it with
 \end_layout
 
 \begin_layout Scrap
+
 <<contour>>=
 \begin_inset Newline newline
 \end_inset
@@ -425,35 +478,43 @@ Once we have the Epsilon plot, we plot it's contour plot to analyze it with
 \end_layout
 
 \begin_layout Scrap
+
 # 7.
  Plotting the Countour
 \end_layout
 
 \begin_layout Scrap
+
 graph.figure(2)
 \end_layout
 
 \begin_layout Scrap
+
 graph.contour(BB,AA,epsilon)
 \end_layout
 
 \begin_layout Scrap
+
 graph.xlabel('$A$')
 \end_layout
 
 \begin_layout Scrap
+
 graph.ylabel('$B$')
 \end_layout
 
 \begin_layout Scrap
+
 graph.title('Contour plot of A and B')
 \end_layout
 
 \begin_layout Scrap
+
 p=[]
 \end_layout
 
 \begin_layout Scrap
+
 errors =[]
 \begin_inset Newline newline
 \end_inset
@@ -475,6 +536,7 @@ We now estimate the error using the method of least squares.
 \end_layout
 
 \begin_layout Scrap
+
 <<estimate>>=
 \begin_inset Newline newline
 \end_inset
@@ -483,36 +545,44 @@ We now estimate the error using the method of least squares.
 \end_layout
 
 \begin_layout Scrap
+
 # 8., 9.
  Estimating error
 \end_layout
 
 \begin_layout Scrap
+
 for x in range(1,10):
 \end_layout
 
 \begin_layout Scrap
+
     least=lstsq(M,L[x].reshape(101,-1))[0]
 \end_layout
 
 \begin_layout Scrap
+
     p.append(least)
 \end_layout
 
 \begin_layout Scrap
+
     err = sqrt(dot(transpose(dot(M,least) - L[x].reshape(101,-1)),dot(M,least)
  - L[x].reshape(101,-1)))        
 \end_layout
 
 \begin_layout Scrap
+
     errors=append(errors,err[0][0])
 \end_layout
 
 \begin_layout Scrap
+
 p=array(p)
 \end_layout
 
 \begin_layout Scrap
+
 sigma = logspace(-1,-3,9)
 \end_layout
 
@@ -521,33 +591,40 @@ sigma = logspace(-1,-3,9)
 \end_layout
 
 \begin_layout Scrap
+
 # 9.
  Plotting normal error 
 \end_layout
 
 \begin_layout Scrap
+
 graph.figure(3)
 \end_layout
 
 \begin_layout Scrap
+
 graph.plot(sigma,errors)
 \end_layout
 
 \begin_layout Scrap
+
 graph.plot(sigma,errors,'ro')
 \end_layout
 
 \begin_layout Scrap
+
 graph.xlabel(r"noise $
 \backslash
 sigma$")
 \end_layout
 
 \begin_layout Scrap
+
 graph.ylabel('error')
 \end_layout
 
 \begin_layout Scrap
+
 graph.title('Plot of error in estimate of A and B vs noise')
 \end_layout
 
@@ -556,33 +633,40 @@ graph.title('Plot of error in estimate of A and B vs noise')
 \end_layout
 
 \begin_layout Scrap
+
 # 10.
  Logarithmic error
 \end_layout
 
 \begin_layout Scrap
+
 graph.figure(4)
 \end_layout
 
 \begin_layout Scrap
+
 graph.loglog(sigma,errors)
 \end_layout
 
 \begin_layout Scrap
+
 graph.loglog(sigma,errors,'ro')
 \end_layout
 
 \begin_layout Scrap
+
 graph.xlabel(r"log($
 \backslash
 sigma$)")
 \end_layout
 
 \begin_layout Scrap
+
 graph.ylabel('log(error)')
 \end_layout
 
 \begin_layout Scrap
+
 graph.title('Plot of logarithmic error in estimate of A and B vs noise')
 \begin_inset Newline newline
 \end_inset
@@ -603,6 +687,7 @@ We now go to the exponents that will optimize the expressions
 \end_layout
 
 \begin_layout Scrap
+
 <<alphabeta>>=
 \begin_inset Newline newline
 \end_inset
@@ -611,31 +696,38 @@ We now go to the exponents that will optimize the expressions
 \end_layout
 
 \begin_layout Scrap
+
 # 11.
  Finding the exponents
 \end_layout
 
 \begin_layout Scrap
+
 noise=log(sigma).reshape((len(log(sigma)),1))
 \end_layout
 
 \begin_layout Scrap
+
 sigma=hstack((ones((len(log(sigma)),1)),noise))
 \end_layout
 
 \begin_layout Scrap
+
 solution=lstsq(sigma,log(errors))
 \end_layout
 
 \begin_layout Scrap
+
 print 'Alpha=%f'%pow(e,solution[0][0])
 \end_layout
 
 \begin_layout Scrap
+
 print 'Beta=%f'%solution[0][1]
 \end_layout
 
 \begin_layout Scrap
+
 graph.show()
 \begin_inset Newline newline
 \end_inset

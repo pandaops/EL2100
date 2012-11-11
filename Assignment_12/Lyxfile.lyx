@@ -24,6 +24,7 @@
 \output_sync 1
 \bibtex_command default
 \index_command default
+\float_placement H
 \paperfontsize default
 \spacing single
 \use_hyperref false
@@ -46,7 +47,7 @@
 \leftmargin 1.5cm
 \topmargin 1.5cm
 \rightmargin 1.5cm
-\bottommargin 0.5cm
+\bottommargin 2cm
 \headheight 0.5cm
 \headsep 0.5cm
 \footskip 0.5cm
@@ -68,7 +69,7 @@
 \begin_body
 
 \begin_layout Title
-Python Assignment -2
+Python Assignment -6
 \end_layout
 
 \begin_layout Author
@@ -80,23 +81,48 @@ EE11B122, IIT Madras
 \end_layout
 
 \begin_layout Abstract
-We demonstrate the quad() function to evaluate integrals and also do error
- analysis on recursive sums using the Trapezoidal method.
+In this assignment, we will look at how to analyse “Linear Time-invariant
+ Systems” with numerical tools in Python.
+ 
 \end_layout
 
-\begin_layout Section*
-Program
+\begin_layout Section
+Spring Behaviour
 \end_layout
 
 \begin_layout Standard
-We include the shebang and import out libraries
+
+\lang english
+Solve for the time response of a spring satisfying 
+\begin_inset Formula $x+\ddot{x=0}$
+\end_inset
+
+with 
+\begin_inset Formula $x(0)=0.1$
+\end_inset
+
+ and 
+\begin_inset Formula $x=0$
+\end_inset
+
+ for 
+\begin_inset Formula $t$
+\end_inset
+
+ going from 
+\begin_inset Formula $0-20$
+\end_inset
+
+ seconds.
+ 
 \end_layout
 
-\begin_layout Subsection*
-Code
+\begin_layout Subsection
+Code 
 \end_layout
 
 \begin_layout Scrap
+
 <<code>>=
 \begin_inset Newline newline
 \end_inset
@@ -105,234 +131,143 @@ Code
 \end_layout
 
 \begin_layout Scrap
+
 #! usr/bin/python
 \end_layout
 
 \begin_layout Scrap
 
+from scipy import *
 \end_layout
 
 \begin_layout Scrap
-from scipy.integrate import quad
+
+from scipy import signal
 \end_layout
 
 \begin_layout Scrap
-from scipy import linspace, cumsum, where
+
+from matplotlib.pyplot import *
 \end_layout
 
 \begin_layout Scrap
-import matplotlib.pyplot as graph
+
 \end_layout
 
 \begin_layout Scrap
-import scipy.special as sp
+
+# The transfer function of the first spring
 \end_layout
 
 \begin_layout Scrap
-from numpy import fabs 	
+
+den=poly1d([1,0,1])
 \end_layout
 
 \begin_layout Scrap
+
+num=poly1d([0.1,0])
+\end_layout
+
+\begin_layout Scrap
+
+spring=signal.lti(num,den)
+\end_layout
+
+\begin_layout Scrap
+
+time=linspace(-20,20,2000)
+\end_layout
+
+\begin_layout Scrap
+
+response=spring.impulse(T=time)[1]
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the behaviour
+\end_layout
+
+\begin_layout Scrap
+
+subplot(221)
+\end_layout
+
+\begin_layout Scrap
+
+title("Spring behaviour")
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r'$x-displacement$')
+\end_layout
+
+\begin_layout Scrap
+
+plot(time,response,'r+')
+\end_layout
+
+\begin_layout Scrap
+
 \begin_inset Newline newline
 \end_inset
 
 @
 \end_layout
 
-\begin_layout Standard
-Now, we set our constants and describe the function that the quad routine
- will use.
- We also declare the vectors that we will be using throughout this program.
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-<<program>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-# The function that Quad uses
-\end_layout
-
-\begin_layout Scrap
-func=lambda x: 1/(1+x**2)
-\end_layout
-
-\begin_layout Scrap
-step=0.1
-\end_layout
-
-\begin_layout Scrap
-err=1
-\end_layout
-
-\begin_layout Scrap
-counter=0
-\end_layout
-
-\begin_layout Scrap
-steps = []
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-samples=sp.arange(0,5+step,step)
-\end_layout
-
-\begin_layout Scrap
-results = sp.linspace(0,0,len(samples))
-\end_layout
-
-\begin_layout Scrap
-manual= sp.linspace(0,0,len(samples))
-\end_layout
-
-\begin_layout Scrap
-estimated_errors, real_errors=[],[]
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-@
+\begin_layout Section
+Coupled Spring behaviour
 \end_layout
 
 \begin_layout Standard
-We then decalre the computing function that takes in two arguements and
- applie dthe 
-\begin_inset Formula $quad()$
-\end_inset
-
- routine and returns the result array.
-\end_layout
-
-\begin_layout Scrap
-<<quadfunc>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-def integrate(samples,results):
-\end_layout
-
-\begin_layout Scrap
-	for i in range(len(samples)):
-\end_layout
-
-\begin_layout Scrap
-	# Compute Results with Quad
-\end_layout
-
-\begin_layout Scrap
-	    results[i]=quad(func,0,samples[i])[0]
-\end_layout
-
-\begin_layout Scrap
-	return results
-\begin_inset Newline newline
-\end_inset
-
-@
+Solve for a coupled spring problem: 
 \end_layout
 
 \begin_layout Standard
-We then declare the function that calculates the above integral using the
- trapezoidal step algorithm.
- It says that
-\end_layout
+\begin_inset Formula 
+\[
+\ddot{x}+(x-y)=0
+\]
 
-\begin_layout Scrap
-<<cumsum>>=
-\begin_inset Newline newline
 \end_inset
 
 
-\end_layout
-
-\begin_layout Scrap
-def series(new_samples,new_results):
-\end_layout
-
-\begin_layout Scrap
-    # Compute manually using recursive summation
-\end_layout
-
-\begin_layout Scrap
-    new_results=step*(cumsum(func(new_samples)) - 0.5*(func(min(new_samples))+fun
-c(new_samples)))
-\end_layout
-
-\begin_layout Scrap
-    return new_results
-\begin_inset Newline newline
-\end_inset
-
-@
 \end_layout
 
 \begin_layout Standard
-Now we write another function that increases our sample size by halving
- the step interval.
- It returns a tuple both of the new sample set and result array
-\end_layout
+\begin_inset Formula 
+\[
+\ddot{y}+2(y-x)=0
+\]
 
-\begin_layout Scrap
-<<ftrap>>=
-\begin_inset Newline newline
 \end_inset
 
 
-\end_layout
-
-\begin_layout Scrap
-def ftrap(oldx,oldy):
-\end_layout
-
-\begin_layout Scrap
-    # Return double of the sample size
-\end_layout
-
-\begin_layout Scrap
-    newx = sp.arange(oldx[0],oldx[-1]+(0.5)*step,0.5*step)
-\end_layout
-
-\begin_layout Scrap
-    newy = sp.linspace(0,0,len(newx))
-\end_layout
-
-\begin_layout Scrap
-    return (newx,newy)
-\begin_inset Newline newline
-\end_inset
-
-@
 \end_layout
 
 \begin_layout Standard
-Now we calculate the maximum error for common points in the old and the
- new array.
- We do this using python list slicing in steps and list comprehension.
- We also calculate the actual value of the function by evaluating our sample
- set with the inbuilt arctan function.
+where the initial conditions are 
+\begin_inset Formula $x(0)=0,\dot{x}(0)=\dot{y}(0)=y(0)=0$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+Python Code
 \end_layout
 
 \begin_layout Scrap
-<<error>>=
+
+<<runsim>>=
 \begin_inset Newline newline
 \end_inset
 
@@ -340,35 +275,28 @@ Now we calculate the maximum error for common points in the old and the
 \end_layout
 
 \begin_layout Scrap
-def error(old,new):
-\end_layout
 
-\begin_layout Scrap
-    # Return the Max absolute value
-\end_layout
-
-\begin_layout Scrap
-    if new is None:
-\end_layout
-
-\begin_layout Scrap
-        return 1
-\end_layout
-
-\begin_layout Scrap
-    new=new[::2]
-\end_layout
-
-\begin_layout Scrap
-    err = max([abs(val) for val in new-old])
-\end_layout
-
-\begin_layout Scrap
-    return err
+# Transfer function of the Coupled Spring - Spring 1
 \end_layout
 
 \begin_layout Scrap
 
+x_num=poly1d([0.5,0,1,])
+\end_layout
+
+\begin_layout Scrap
+
+x_den=poly1d([0.5,0,1.5,0]) 
+\end_layout
+
+\begin_layout Scrap
+
+spring=signal.lti(x_num,x_den)
+\end_layout
+
+\begin_layout Scrap
+
+response = spring.impulse(T=time)[1]
 \end_layout
 
 \begin_layout Scrap
@@ -376,388 +304,527 @@ def error(old,new):
 \end_layout
 
 \begin_layout Scrap
-results = integrate(samples,results)
+
+# Plotting the behaviour 
 \end_layout
 
 \begin_layout Scrap
-preset = sp.arctan(samples)
+
+subplot(223)
 \end_layout
 
 \begin_layout Scrap
-preset_errors = [fabs(x) for x in results-preset]
+
+title("Coupled Spring behaviour - X")
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r'$time$')
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r'$x-displacement$')
+\end_layout
+
+\begin_layout Scrap
+
+plot(time,response,'r+')
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Transfer function of the Coupled Spring - Spring 2
+\end_layout
+
+\begin_layout Scrap
+
+y_num=poly1d([1,0])
+\end_layout
+
+\begin_layout Scrap
+
+y_den=poly1d([0.5,0,1.5,0,0]) 
+\end_layout
+
+\begin_layout Scrap
+
+spring=signal.lti(y_num,y_den)
+\end_layout
+
+\begin_layout Scrap
+
+response = spring.impulse(T=time)[1]
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the behaviour 
+\end_layout
+
+\begin_layout Scrap
+
+subplot(224)
+\end_layout
+
+\begin_layout Scrap
+
+title("Coupled Spring behaviour - Y")
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r'$time$')
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r'$Y-displacement$')
+\end_layout
+
+\begin_layout Scrap
+
+plot(time,response,'r+')
+\end_layout
+
+\begin_layout Scrap
+
 \begin_inset Newline newline
 \end_inset
 
 @
 \end_layout
 
-\begin_layout Standard
-Before we move on to minimizing error, we store the current values of the
- 
-\begin_inset Formula $quad()$
-\end_inset
-
- with the preset values of the function.
- We also plot a graph to analyze the semilogy plot of the errors between
- the 
-\begin_inset Formula $quad$
-\end_inset
-
- function and the 
-\begin_inset Formula $arctan$
-\end_inset
-
- function.
-\end_layout
-
-\begin_layout Scrap
-<<graphs_1>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-graph.figure(1)
-\end_layout
-
-\begin_layout Scrap
-graph.plot(samples,results,'ro',samples,preset,'k')
-\end_layout
-
-\begin_layout Scrap
-graph.legend(('quad fn',r'$tan^{-1}(x)$'))
-\end_layout
-
-\begin_layout Scrap
-graph.title(r'Plot of $1/(1+t^{2})$')
-\end_layout
-
-\begin_layout Scrap
-graph.xlabel(r'$x$')
-\end_layout
-
-\begin_layout Scrap
-graph.ylabel('quad fn')
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-graph.figure(2)
-\end_layout
-
-\begin_layout Scrap
-graph.semilogy(samples,preset_errors,'ro')
-\end_layout
-
-\begin_layout Scrap
-graph.xlabel(r'$x$')
-\end_layout
-
-\begin_layout Scrap
-graph.ylabel('Error')
-\end_layout
-
-\begin_layout Scrap
-graph.title(r'Error in $
-\backslash
-int_{0}^{x}dt/(1+t^{2})$')
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-results = series(samples,manual)
-\end_layout
-
-\begin_layout Scrap
-new_samples=samples
-\end_layout
-
-\begin_layout Scrap
-new_results=results
-\begin_inset Newline newline
-\end_inset
-
-@
+\begin_layout Section
+Curcuit Analysis
 \end_layout
 
 \begin_layout Standard
-We now estimate the error using the method of vectors and recursive iteration.
- We state that we want an 
-\begin_inset Formula $\varepsilon$
+Obtain the magnitude and phase response of the Transfer function of the
+ given two-network with 
+\begin_inset Formula $L=10^{-3},R_{1}=10,R_{2}=100$
 \end_inset
 
- < 
-\begin_inset Formula $10^{-8}$
-\end_inset
-
- or a maximium of 9 iterations.
- Each iteration, we call 
-\begin_inset Formula $ftrap()$
-\end_inset
-
- and double the sample set to increase accuracy.
- We then calculate and store two different errors - the error between common
- points and the error with the preset 
-\begin_inset Formula $arctan()$
-\end_inset
-
- function\SpecialChar \@.
-
-\end_layout
-
-\begin_layout Scrap
-<<estimate>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-# Keep doing until error is below tolerance or counter reaches 9
-\end_layout
-
-\begin_layout Scrap
-while(err>pow(10,-7)):
-\end_layout
-
-\begin_layout Scrap
-    counter+=1
-\end_layout
-
-\begin_layout Scrap
-    if counter>9:
-\end_layout
-
-\begin_layout Scrap
-        break
-\end_layout
-
-\begin_layout Scrap
-    new_samples,new_results=ftrap(samples,results)
-\end_layout
-
-\begin_layout Scrap
-    step = step/2
-\end_layout
-
-\begin_layout Scrap
-    steps.append(step)
-\end_layout
-
-\begin_layout Scrap
-    new_results = series(new_samples,new_results)
-\end_layout
-
-\begin_layout Scrap
-    if counter==1:
-\end_layout
-
-\begin_layout Scrap
-        graph.figure(3)
-\end_layout
-
-\begin_layout Scrap
-        graph.plot(new_samples,new_results,'ro',samples,preset,'k')
-\end_layout
-
-\begin_layout Scrap
-        graph.xlabel(r'$x$')
-\end_layout
-
-\begin_layout Scrap
-        graph.ylabel(r'$
-\backslash
-int_{0}^{x}
-\backslash
-frac{dt}{(1+t^{2})}$')
-\end_layout
-
-\begin_layout Scrap
-        graph.title('Integration using Trapezoidal Rule') 
-\end_layout
-
-\begin_layout Scrap
-    err = error(results,new_results)
-\end_layout
-
-\begin_layout Scrap
-    samples=new_samples
-\end_layout
-
-\begin_layout Scrap
-    results=new_results
-\end_layout
-
-\begin_layout Scrap
-    preset = sp.arctan(new_samples)
-\end_layout
-
-\begin_layout Scrap
-    real_errors.append(max([fabs(x) for x in new_results-preset]))
-\end_layout
-
-\begin_layout Scrap
-    estimated_errors.append(err)
-\end_layout
-
-\begin_layout Scrap
-    print "Running Ftrap iteration", counter 
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-Finally, we plot the loglog plot of the two different types of errors and
- we see the similarity in their nature.
-\end_layout
-
-\begin_layout Scrap
-
-\end_layout
-
-\begin_layout Scrap
-<<graphs_2>>=
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Scrap
-graph.figure(4)
-\end_layout
-
-\begin_layout Scrap
-graph.title(r'Error in $
-\backslash
-int_{0}^{x}dt/(1+t^{2})$')
-\end_layout
-
-\begin_layout Scrap
-graph.xlabel(r'$log(x)$')
-\end_layout
-
-\begin_layout Scrap
-graph.ylabel(r'Log(Error)')
-\end_layout
-
-\begin_layout Scrap
-graph.loglog(steps,estimated_errors,'ro',steps,real_errors,'+')
-\end_layout
-
-\begin_layout Scrap
-graph.legend(('Exact error','Estimated error'))
-\end_layout
-
-\begin_layout Scrap
-graph.show()
-\begin_inset Newline newline
-\end_inset
-
-@
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename quad.png
-	scale 60
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Plot of Quad with arctan
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename semilog.png
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Semilog plot of the error
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename Trapezoid.png
-	scale 60
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-Plot of the trapezoidal series.
- As we can see, it is remarkably accurate.
  
 \end_layout
 
+\begin_layout Standard
+Also, plot the properties of the transfer function.
+\end_layout
+
+\begin_layout Subsection
+
+\lang english
+Python Code
+\end_layout
+
+\begin_layout Scrap
+
+<<fft>>=
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Scrap
+
+# Components of the circuit
+\end_layout
+
+\begin_layout Scrap
+
+L=1e-3
+\end_layout
+
+\begin_layout Scrap
+
+R1=10
+\end_layout
+
+\begin_layout Scrap
+
+R2=100
+\end_layout
+
+\begin_layout Scrap
+
+omega=logspace(3,9,61).reshape((61,1))
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Transfer Function
+\end_layout
+
+\begin_layout Scrap
+
+H=1/((R1/R2)+1+(1j*omega*L/R2))
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the magnitude of H
+\end_layout
+
+\begin_layout Scrap
+
+figure(3)
+\end_layout
+
+\begin_layout Scrap
+
+subplot(211)
+\end_layout
+
+\begin_layout Scrap
+
+loglog(omega,abs(H),'ro')
+\end_layout
+
+\begin_layout Scrap
+
+title("frequency response")
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r'$
+\backslash
+omega$')
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r'$|H|$')
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the phase of H
+\end_layout
+
+\begin_layout Scrap
+
+subplot(212)
+\end_layout
+
+\begin_layout Scrap
+
+semilogx(omega,180*angle(H)/pi,'ro')
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r"$
+\backslash
+omega$")
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r"Arg$(H)$")
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Simlulating Step response
+\end_layout
+
+\begin_layout Scrap
+
+den=poly1d([1*L,R1+R2])
+\end_layout
+
+\begin_layout Scrap
+
+print "Pole(s) are ", roots(den)
+\end_layout
+
+\begin_layout Scrap
+
+sys=signal.lti(R2,den)
+\end_layout
+
+\begin_layout Scrap
+
+time=linspace(0,1e-4,1000)
+\end_layout
+
+\begin_layout Scrap
+
+step_response = sys.step(T=time)[1]
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the Step response
+\end_layout
+
+\begin_layout Scrap
+
+figure(5)
+\end_layout
+
+\begin_layout Scrap
+
+plot(time, step_response)
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r'$t$')
+\end_layout
+
+\begin_layout Scrap
+
+title('Step response')
+\end_layout
+
+\begin_layout Scrap
+
+t=linspace(0,50,513)*1e-6;t=t[0:-1]
+\end_layout
+
+\begin_layout Scrap
+
+vi=array(cos(1e5*t))
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Analysing circuit in fft domain
+\end_layout
+
+\begin_layout Scrap
+
+Vi=fft(vi)
+\end_layout
+
+\begin_layout Scrap
+
+wmax=1/(t[1]-t[0])
+\end_layout
+
+\begin_layout Scrap
+
+frq=linspace(-0.5,0.5,513)*wmax
+\end_layout
+
+\begin_layout Scrap
+
+frq=frq[0:-1]
+\end_layout
+
+\begin_layout Scrap
+
+Vi=hstack([Vi[256:512],Vi[0:256]])
+\end_layout
+
+\begin_layout Scrap
+
+omega=2*pi*frq
+\end_layout
+
+\begin_layout Scrap
+
+print L, R1, R2
+\end_layout
+
+\begin_layout Scrap
+
+den=poly1d([1j*L,R1+R2])
+\end_layout
+
+\begin_layout Scrap
+
+H=100.0/den(omega)
+\end_layout
+
+\begin_layout Scrap
+
+Vo=array(Vi)*array(H)
+\end_layout
+
+\begin_layout Scrap
+
+Vo=hstack([Vo[256:512],Vo[0:256]])
+\end_layout
+
+\begin_layout Scrap
+
+vo=ifft(Vo)
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the Frequency Response
+\end_layout
+
+\begin_layout Scrap
+
+figure(6)
+\end_layout
+
+\begin_layout Scrap
+
+subplot(211)
+\end_layout
+
+\begin_layout Scrap
+
+plot(frq,abs(Vo),'k')
+\end_layout
+
+\begin_layout Scrap
+
+title("Output Frequency Response")
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r"$
+\backslash
+omega$")
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r"$|Vo|$")
+\end_layout
+
+\begin_layout Scrap
+
+subplot(212)
+\end_layout
+
+\begin_layout Scrap
+
+plot(frq,angle(Vo)*180/pi,'k')
+\end_layout
+
+\begin_layout Scrap
+
+xlabel(r"$
+\backslash
+omega$")
+\end_layout
+
+\begin_layout Scrap
+
+ylabel(r"$arg(Vo)$")
+\end_layout
+
+\begin_layout Scrap
+
+\end_layout
+
+\begin_layout Scrap
+
+# Plotting the output and input
+\end_layout
+
+\begin_layout Scrap
+
+figure(7)
+\end_layout
+
+\begin_layout Scrap
+
+plot(t,vo,'g')
+\end_layout
+
+\begin_layout Scrap
+
+plot(t,vi,'b')
+\end_layout
+
+\begin_layout Scrap
+
+legend(('Input','Output'))
+\end_layout
+
+\begin_layout Scrap
+
+axhline(0, color='black')
+\end_layout
+
+\begin_layout Scrap
+
+xlabel("Time")
+\end_layout
+
+\begin_layout Scrap
+
+ylabel("Response")
+\end_layout
+
+\begin_layout Scrap
+
+title("Input and Outptut Signals")
+\end_layout
+
+\begin_layout Scrap
+
+show()
+\begin_inset Newline newline
+\end_inset
+
+@
+\end_layout
+
+\begin_layout Part*
+
+Plots
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename error_estimate.png
+	filename spring.png
 	scale 60
 
 \end_inset
@@ -766,18 +833,167 @@ Plot of the trapezoidal series.
 \end_layout
 
 \begin_layout Plain Layout
-LogLog plots
-\end_layout
 
-\begin_layout Plain Layout
 \begin_inset Caption
 
 \begin_layout Plain Layout
-Normal plot of the trapezoidal method and LogLog plots of the errors
+
+Spring
 \end_layout
 
 \end_inset
 
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename H.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Transfer Function
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename step.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+Step Response
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename inout.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+Input/Output voltage
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename fft.png
+	scale 60
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+FFT an phase
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
 
 \end_layout
 
